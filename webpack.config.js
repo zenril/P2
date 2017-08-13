@@ -2,7 +2,7 @@
  var webpack = require('webpack');
      
  module.exports = {
-    entry: './src/core.js',
+    entry: './src/Core.js',
     output: {
         path: path.resolve(__dirname, 'build'),
         filename: 'parzen.js'

@@ -1,15 +1,16 @@
 import is from 'is_js';
+import Tag from './Tag.js';
 
 class Parzen {
 
-    {{$a:a.b.c|an|h}}
-
-
     constructor(props) {
-        this.REGEX_TAG = 
+        this.REGEX_TAG = /\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g;
+        this.SMALL_TAG = /\{\{([^{}]*)\}\}/g
         this.data = props.data;
         this.variables = {};
     }
+
+
 
     getRandomWord(list)
     {
@@ -19,21 +20,19 @@ class Parzen {
     make(props)
     {
         var start = this.getListString(props.base);
-
         var complete = this.recurse(start.str);
-
     }
 
     recurse(string)
     {
-        if(is.not.string(string)){
+        if(is.string(string)){
             string.replace(this.REGEX_TAG, this.parseTag);
         }
     }
 
-    parseTag()
+    parseTag(whole,middle)
     {
-
+        $tag = new Tag(middle);
     }
 
     getListString(name) 
