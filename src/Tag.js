@@ -10,6 +10,13 @@ export default class Tag {
         
         this.rawTag = match;
 
+        this.variable = this.parseVariable();
+        this.path = this.parsePath();
+        this.formatters = this.parseFormatters();
+        this.preFormatters = this.parsePreformatters();
+
+        this.value = '';
+
     }
 
     parseVariable(){
@@ -23,7 +30,7 @@ export default class Tag {
     parsePath(){
         var path = this.rawTag.match( this.REGEX_PATH );
         if(is.array(path)){
-            return path[1];
+            return path[1].replace(/(\[|\]\.)/g,".").replace(/\]/g, "").split('.');;
         }
         return null;
     }
