@@ -990,13 +990,7 @@ var _is_js = __webpack_require__(0);
 
 var _is_js2 = _interopRequireDefault(_is_js);
 
-var _Tag = __webpack_require__(3);
-
-var _Tag2 = _interopRequireDefault(_Tag);
-
-var _PList = __webpack_require__(4);
-
-var _PList2 = _interopRequireDefault(_PList);
+var _model = __webpack_require__(3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1009,13 +1003,13 @@ var Parzen = function () {
         this.REGEX_TAG = /\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g;
         this.SMALL_TAG = /\{\{([^{}]*)\}\}/g;
         this.variables = {};
-        this.store = new Store(props.data);
+        this.store = new _model.PList(props.data);
     }
 
     _createClass(Parzen, [{
         key: 'make',
         value: function make(props) {
-            var start = this.store.get(new _Tag2.default("root"));
+            var start = this.store.get(new _model.Tag("root"));
             console.log(start);
             //var complete = this.recurse(start.str);
         }
@@ -1029,7 +1023,7 @@ var Parzen = function () {
     }, {
         key: 'parseTag',
         value: function parseTag(whole, middle) {
-            $tag = new _Tag2.default(middle);
+            $tag = new _model.Tag(middle);
         }
     }]);
 
@@ -1067,6 +1061,41 @@ module.exports = g;
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Tag = __webpack_require__(4);
+
+Object.keys(_Tag).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _Tag[key];
+    }
+  });
+});
+
+var _Plist = __webpack_require__(5);
+
+Object.keys(_Plist).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _Plist[key];
+    }
+  });
+});
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1153,7 +1182,7 @@ var Tag = function () {
 exports.default = Tag;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -1,6 +1,6 @@
 import is from 'is_js';
 
-export default class Tag {
+export default class Tag{
 
     constructor(match) {
         this.REGEX_VARIABLE = /\$[^:]*/;

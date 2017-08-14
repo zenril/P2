@@ -14,12 +14,13 @@
                 loader: 'babel-loader',
                 exclude: /(node_modules|bower_components)/,
                 query: {
-                    presets: ['es2015', 'es2016', 'react']
+                    presets: ['es2015', 'es2016']
                 }
             }
         ]
     },
     plugins: [
+        
         // new webpack.DefinePlugin({
         //     'process.env': {
         //         NODE_ENV: JSON.stringify('production')

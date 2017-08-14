@@ -1,7 +1,7 @@
 import is from 'is_js';
 
 let instance = null;
-export default class PList  
+export default class PList
 {
 
     constructor (data) 

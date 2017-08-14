@@ -1,6 +1,5 @@
 import is from 'is_js';
-import Tag from './Tag';
-import PList from './PList';
+import {PList, Tag} from './model';
 
 class Parzen {
 
@@ -9,7 +8,7 @@ class Parzen {
         this.REGEX_TAG = /\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g;
         this.SMALL_TAG = /\{\{([^{}]*)\}\}/g
         this.variables = {};
-        this.store = new Store(props.data);
+        this.store = new PList(props.data);
     }
 
     make(props)
