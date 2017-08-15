@@ -1,5 +1,7 @@
-import is from 'is_js';
-import {PList, Tag} from './model';
+var is = require('is_js');
+var PList = require('./model/PList.js');
+var Tag = require('./model/Tag.js');
+
 
 class Parzen {
 
@@ -32,4 +34,10 @@ class Parzen {
     }
 }
 
-window.Parzen = Parzen;
+var p = Parzen({
+    data : {
+        root : ["abc","def","hiv"]
+    }
+});
+
+p.make();

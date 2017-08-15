@@ -986,15 +986,11 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _is_js = __webpack_require__(0);
-
-var _is_js2 = _interopRequireDefault(_is_js);
-
-var _model = __webpack_require__(3);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var is = __webpack_require__(0);
+var PList = __webpack_require__(3);
+var Tag = __webpack_require__(4);
 
 var Parzen = function () {
     function Parzen(props) {
@@ -1003,34 +999,40 @@ var Parzen = function () {
         this.REGEX_TAG = /\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g;
         this.SMALL_TAG = /\{\{([^{}]*)\}\}/g;
         this.variables = {};
-        this.store = new _model.PList(props.data);
+        this.store = new PList(props.data);
     }
 
     _createClass(Parzen, [{
         key: 'make',
         value: function make(props) {
-            var start = this.store.get(new _model.Tag("root"));
+            var start = this.store.get(new Tag("root"));
             console.log(start);
             //var complete = this.recurse(start.str);
         }
     }, {
         key: 'recurse',
         value: function recurse(string) {
-            if (_is_js2.default.string(string)) {
+            if (is.string(string)) {
                 string.replace(this.REGEX_TAG, this.parseTag);
             }
         }
     }, {
         key: 'parseTag',
         value: function parseTag(whole, middle) {
-            $tag = new _model.Tag(middle);
+            $tag = new Tag(middle);
         }
     }]);
 
     return Parzen;
 }();
 
-window.Parzen = Parzen;
+var p = Parzen({
+    data: {
+        root: ["abc", "def", "hiv"]
+    }
+});
+
+p.make();
 
 /***/ }),
 /* 2 */
@@ -1067,140 +1069,14 @@ module.exports = g;
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _Tag = __webpack_require__(4);
-
-Object.keys(_Tag).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _Tag[key];
-    }
-  });
-});
-
-var _Plist = __webpack_require__(5);
-
-Object.keys(_Plist).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _Plist[key];
-    }
-  });
-});
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _is_js = __webpack_require__(0);
-
-var _is_js2 = _interopRequireDefault(_is_js);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Tag = function () {
-    function Tag(match) {
-        _classCallCheck(this, Tag);
-
-        this.REGEX_VARIABLE = /\$[^:]*/;
-        this.REGEX_PATH = /^(?:\$[^:]+:){0,1}([^|&]*)/;
-        this.REGEX_FORMATTERS = /\|([^\-][^|]*)/g;
-        this.REGEX_PRE_FORMATTERS = /\|-([^|]*)/g;
-
-        this.rawTag = match;
-
-        this.variable = this.parseVariable();
-        this.path = this.parsePath();
-        this.formatters = this.parseFormatters();
-        this.preFormatters = this.parsePreformatters();
-
-        this.value = '';
-    }
-
-    _createClass(Tag, [{
-        key: 'parseVariable',
-        value: function parseVariable() {
-            var variable = this.rawTag.match(this.REGEX_VARIABLE);
-            if (_is_js2.default.array(variable)) {
-                return variable[0];
-            }
-            return null;
-        }
-    }, {
-        key: 'parsePath',
-        value: function parsePath() {
-            var path = this.rawTag.match(this.REGEX_PATH);
-            if (_is_js2.default.array(path)) {
-                return path[1].replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');;
-            }
-            return null;
-        }
-    }, {
-        key: 'parseFormatters',
-        value: function parseFormatters() {
-            var formatter = this.rawTag.match(this.REGEX_FORMATTERS);
-            if (_is_js2.default.array(formatter)) {
-                return formatter.map(function (a) {
-                    return a.substr(1);
-                });
-            }
-            return null;
-        }
-    }, {
-        key: 'parsePreformatters',
-        value: function parsePreformatters() {
-            var formatter = this.rawTag.match(this.REGEX_PRE_FORMATTERS);
-            if (_is_js2.default.array(formatter)) {
-                return formatter.map(function (a) {
-                    return a.substr(2);
-                });
-            }
-            return null;
-        }
-    }]);
-
-    return Tag;
-}();
-
-exports.default = Tag;
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _is_js = __webpack_require__(0);
-
-var _is_js2 = _interopRequireDefault(_is_js);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var is = __webpack_require__(0);
 
 var instance = null;
 
@@ -1233,7 +1109,7 @@ var PList = function () {
                     obj[key] = {};
                 }
 
-                if (_is_js2.default.not.array(obj[key]) && i == path.length - 1) {
+                if (is.not.array(obj[key]) && i == path.length - 1) {
                     obj[key] = [];
                 }
 
@@ -1288,7 +1164,7 @@ var PList = function () {
 
             //handle nested lists
             var current = "";
-            while (_is_js2.default.object(data) && _is_js2.default.not.array(data)) {
+            while (is.object(data) && is.not.array(data)) {
                 if (path.length) {
                     current = path.shift();
                 }
@@ -1312,7 +1188,7 @@ var PList = function () {
             }
 
             //now actuallt
-            if (_is_js2.default.array(data)) {
+            if (is.array(data)) {
                 if (result.index != null) {
                     result.str = data[result.index];
                 }
@@ -1329,6 +1205,89 @@ var PList = function () {
 }();
 
 exports.default = PList;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var is = __webpack_require__(0);
+
+var Tag = function () {
+    function Tag(match) {
+        _classCallCheck(this, Tag);
+
+        this.REGEX_VARIABLE = /\$[^:]*/;
+        this.REGEX_PATH = /^(?:\$[^:]+:){0,1}([^|&]*)/;
+        this.REGEX_FORMATTERS = /\|([^\-][^|]*)/g;
+        this.REGEX_PRE_FORMATTERS = /\|-([^|]*)/g;
+
+        this.rawTag = match;
+
+        this.variable = this.parseVariable();
+        this.path = this.parsePath();
+        this.formatters = this.parseFormatters();
+        this.preFormatters = this.parsePreformatters();
+
+        this.value = '';
+    }
+
+    _createClass(Tag, [{
+        key: 'parseVariable',
+        value: function parseVariable() {
+            var variable = this.rawTag.match(this.REGEX_VARIABLE);
+            if (is.array(variable)) {
+                return variable[0];
+            }
+            return null;
+        }
+    }, {
+        key: 'parsePath',
+        value: function parsePath() {
+            var path = this.rawTag.match(this.REGEX_PATH);
+            if (is.array(path)) {
+                return path[1].replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');;
+            }
+            return null;
+        }
+    }, {
+        key: 'parseFormatters',
+        value: function parseFormatters() {
+            var formatter = this.rawTag.match(this.REGEX_FORMATTERS);
+            if (is.array(formatter)) {
+                return formatter.map(function (a) {
+                    return a.substr(1);
+                });
+            }
+            return null;
+        }
+    }, {
+        key: 'parsePreformatters',
+        value: function parsePreformatters() {
+            var formatter = this.rawTag.match(this.REGEX_PRE_FORMATTERS);
+            if (is.array(formatter)) {
+                return formatter.map(function (a) {
+                    return a.substr(2);
+                });
+            }
+            return null;
+        }
+    }]);
+
+    return Tag;
+}();
+
+exports.default = Tag;
 
 /***/ })
 /******/ ]);

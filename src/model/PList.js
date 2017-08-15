@@ -1,4 +1,4 @@
-import is from 'is_js';
+var is = require('is_js');
 
 let instance = null;
 export default class PList

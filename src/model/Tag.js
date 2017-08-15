@@ -1,4 +1,4 @@
-import is from 'is_js';
+var is = require('is_js');
 
 export default class Tag{
 
