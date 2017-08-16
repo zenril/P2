@@ -989,15 +989,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
-var PList = __webpack_require__(3);
-var Tag = __webpack_require__(4);
+var PList = __webpack_require__(3).default;
+var Tag = __webpack_require__(4).default;
 
 var Parzen = function () {
     function Parzen(props) {
         _classCallCheck(this, Parzen);
 
-        this.REGEX_TAG = /\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g;
-        this.SMALL_TAG = /\{\{([^{}]*)\}\}/g;
         this.variables = {};
         this.store = new PList(props.data);
     }
@@ -1005,34 +1003,36 @@ var Parzen = function () {
     _createClass(Parzen, [{
         key: 'make',
         value: function make(props) {
-            var start = this.store.get(new Tag("root"));
-            console.log(start);
+            this.store.clear();
+
+            var root = new Tag(props.src);
+            root.value = this.store.get(root).str;
+
+            return this.recurse(root);
             //var complete = this.recurse(start.str);
         }
     }, {
         key: 'recurse',
-        value: function recurse(string) {
-            if (is.string(string)) {
-                string.replace(this.REGEX_TAG, this.parseTag);
-            }
-        }
-    }, {
-        key: 'parseTag',
-        value: function parseTag(whole, middle) {
-            $tag = new Tag(middle);
+        value: function recurse(pTag) {
+            var self = this;
+            var store = this.store;
+            var ret = pTag.findTags(function (whole, middle) {
+
+                var tag = new Tag(middle);
+                console.log(tag);
+                tag.value = store.get(tag).str;
+
+                return self.recurse(tag);
+            });
+
+            return ret;
         }
     }]);
 
     return Parzen;
 }();
 
-var p = Parzen({
-    data: {
-        root: ["abc", "def", "hiv"]
-    }
-});
-
-p.make();
+window.Parzen = Parzen;
 
 /***/ }),
 /* 2 */
@@ -1144,8 +1144,8 @@ var PList = function () {
             this.tempData = {};
         }
     }, {
-        key: "geta",
-        value: function geta(tag) {
+        key: "get",
+        value: function get(tag) {
             var path = tag.path;
             if (!path.length) {
                 return null;
@@ -1155,9 +1155,10 @@ var PList = function () {
                 index: null,
                 path: [],
                 str: ""
+            };
 
-                //is normal path or a variable
-            };var data = this.data;
+            //is normal path or a variable
+            var data = this.data;
             if (path.length > 0 && path[0].substr(0, 1) == "$") {
                 data = this.tempData;
             }
@@ -1189,13 +1190,14 @@ var PList = function () {
 
             //now actuallt
             if (is.array(data)) {
+
                 if (result.index != null) {
                     result.str = data[result.index];
                 }
 
-                if (result.index + 1 > data.lengh) {
-                    result.str = this.getRandomWord(data);
-                }
+                //if (result.index + 1 > data.lengh) {
+                result.str = this.getRandomWord(data);
+                //}
             }
             return result;
         }
@@ -1243,6 +1245,16 @@ var Tag = function () {
     }
 
     _createClass(Tag, [{
+        key: 'findTags',
+        value: function findTags(callback) {
+            var REGEX_TAG = /\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g;
+            var SMALL_TAG = /\{\{([^{}]*)\}\}/g;
+
+            if (is.string(this.value)) {
+                return this.value.replace(SMALL_TAG, callback);
+            }
+        }
+    }, {
         key: 'parseVariable',
         value: function parseVariable() {
             var variable = this.rawTag.match(this.REGEX_VARIABLE);
@@ -1256,7 +1268,7 @@ var Tag = function () {
         value: function parsePath() {
             var path = this.rawTag.match(this.REGEX_PATH);
             if (is.array(path)) {
-                return path[1].replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');;
+                return path[1].replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');
             }
             return null;
         }
