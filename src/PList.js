@@ -57,6 +57,12 @@ class PList {
         this.tempData = {};
     }
 
+    populate(tag){
+        var ret = this.get(tag);
+        tag.value = ret.str;
+        tag.path = ret.path;
+    }
+
     get(tag) 
     {
         let path = tag.path;

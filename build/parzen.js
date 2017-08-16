@@ -1006,7 +1006,7 @@ var Parzen = function () {
             this.store.clear();
 
             var root = new Tag(props.src);
-            root.value = this.store.get(root).str;
+            this.store.populate(root);
 
             return this.recurse(root);
             //var complete = this.recurse(start.str);
@@ -1019,8 +1019,7 @@ var Parzen = function () {
             var ret = pTag.findTags(function (whole, middle) {
 
                 var tag = new Tag(middle);
-                console.log(tag);
-                tag.value = store.get(tag).str;
+                store.populate(tag);
 
                 return self.recurse(tag);
             });
@@ -1142,6 +1141,13 @@ var PList = function () {
         key: "clear",
         value: function clear() {
             this.tempData = {};
+        }
+    }, {
+        key: "populate",
+        value: function populate(tag) {
+            var ret = this.get(tag);
+            tag.value = ret.str;
+            tag.path = ret.path;
         }
     }, {
         key: "get",

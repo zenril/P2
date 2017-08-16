@@ -13,7 +13,7 @@ class Parzen {
         this.store.clear();
         
         var root = new Tag(props.src);
-        root.value = this.store.get(root).str;
+        this.store.populate(root);
 
         return this.recurse(root);
         //var complete = this.recurse(start.str);
@@ -26,8 +26,7 @@ class Parzen {
         var ret = pTag.findTags((whole, middle) => {
 
             var tag = new Tag(middle);
-            console.log(tag);
-            tag.value = store.get(tag).str;
+            store.populate(tag)
 
             return self.recurse(tag);
         });
