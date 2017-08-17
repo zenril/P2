@@ -59,8 +59,15 @@ class PList {
 
     populate(tag){
         var ret = this.get(tag);
+
+        if(!ret){
+            return false;
+        }
+
         tag.value = ret.str;
         tag.path = ret.path;
+        
+        return true;
     }
 
     get(tag) 
@@ -125,8 +132,10 @@ class PList {
             //if (result.index + 1 > data.lengh) {
             result.str = this.getRandomWord(data);
             //}
+            return result;
         }
-        return result;
+        return null;
+        
     }
 }
 

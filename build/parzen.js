@@ -1019,9 +1019,13 @@ var Parzen = function () {
             var ret = pTag.findTags(function (whole, middle) {
 
                 var tag = new Tag(middle);
-                store.populate(tag);
+                console.log(tag);
 
-                return self.recurse(tag);
+                if (store.populate(tag)) {
+                    return self.recurse(tag);
+                } else {
+                    return whole;
+                }
             });
 
             return ret;
@@ -1146,8 +1150,15 @@ var PList = function () {
         key: "populate",
         value: function populate(tag) {
             var ret = this.get(tag);
+
+            if (!ret) {
+                return false;
+            }
+
             tag.value = ret.str;
             tag.path = ret.path;
+
+            return true;
         }
     }, {
         key: "get",
@@ -1204,8 +1215,9 @@ var PList = function () {
                 //if (result.index + 1 > data.lengh) {
                 result.str = this.getRandomWord(data);
                 //}
+                return result;
             }
-            return result;
+            return null;
         }
     }]);
 

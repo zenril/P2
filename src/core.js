@@ -25,10 +25,15 @@ class Parzen {
         let store = this.store;
         var ret = pTag.findTags((whole, middle) => {
 
+            
             var tag = new Tag(middle);
-            store.populate(tag)
-
-            return self.recurse(tag);
+            console.log(tag);
+            
+            if(store.populate(tag)){
+                return self.recurse(tag);
+            } else {
+                return whole;
+            }            
         });
 
         return ret;
