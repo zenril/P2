@@ -25,9 +25,9 @@ class Parzen {
         let store = this.store;
         var ret = pTag.findTags((whole, middle) => {
 
-            
+
+            console.log(middle);
             var tag = new Tag(middle);
-            console.log(tag);
             
             if(store.populate(tag)){
                 return self.recurse(tag);

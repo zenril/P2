@@ -14,7 +14,7 @@
 var p = new Parzen({
     data : {
         root : {
-            big : ["abc {{test}} {{asdire}}"] 
+            big : ["abc {{$t1:test}} {{$t1}}"] 
         },
         test : ["tv1","tv2 {{tree|reverse|-delete}}"],
         tree : ["green", "orange"]

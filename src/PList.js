@@ -57,12 +57,26 @@ class PList {
         this.tempData = {};
     }
 
+    saveVariable(tag){
+        if(!tag.variable){
+            return;
+        }
+        
+        if(!this.tempData[tag.variable]){
+            this.tempData[tag.variable] = [];
+        }
+
+        this.tempData[tag.variable].push(tag);
+    }
+
     populate(tag){
         var ret = this.get(tag);
 
         if(!ret){
             return false;
         }
+        
+        this.saveVariable(tag);
 
         tag.value = ret.str;
         tag.path = ret.path;
@@ -77,22 +91,31 @@ class PList {
             return null;
         }
 
+        
         let result = {
             index: null,
             path: [],
-            str: ""         
+            str: ""
         };
 
         //is normal path or a variable
+        //if its trying to select a pre saved variable changed to temp data struct
         var data = this.data;
         if (path.length > 0 && path[0].substr(0, 1) == "$") 
         {
             data = this.tempData;
         }
 
+
+        //if the root node doesnt match we wont return any matches
+        var base = path[0];
+        if(!data[base]){
+            return null;
+        }
+
         //handle nested lists
         var current = "";
-        while (is.object(data) && is.not.array(data)) 
+        while (is.object(data) && is.not.array(data))
         {
             if (path.length) 
             {
@@ -124,14 +147,10 @@ class PList {
         //now actuallt
         if (is.array(data)) 
         {
-
             if (result.index != null) {
                 result.str = data[result.index];
             }
-
-            //if (result.index + 1 > data.lengh) {
             result.str = this.getRandomWord(data);
-            //}
             return result;
         }
         return null;
