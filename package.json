@@ -4,9 +4,7 @@
   "description": "",
   "main": "./src/Core.js",
   "scripts": {
-    "build": "webpack --watch",
-    "compile": "webpack",
-    "prepublish": "npm run compile"
+    "build": "webpack --watch"
   },
   "author": "",
   "license": "ISC",
