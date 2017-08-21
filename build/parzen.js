@@ -989,7 +989,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
-var PList = __webpack_require__(3).default;
+var Store = __webpack_require__(3).default;
 var Tag = __webpack_require__(4).default;
 
 var Parzen = function () {
@@ -997,38 +997,28 @@ var Parzen = function () {
         _classCallCheck(this, Parzen);
 
         this.variables = {};
-        this.store = new PList(props.data);
+        this.store = new Store(props.data);
     }
 
     _createClass(Parzen, [{
         key: 'make',
         value: function make(props) {
             this.store.clear();
-
-            var root = new Tag(props.src);
-            this.store.populate(root);
-
-            return this.recurse(root);
+            return this.recurse(props.src);
             //var complete = this.recurse(start.str);
         }
     }, {
         key: 'recurse',
-        value: function recurse(pTag) {
+        value: function recurse(stag) {
             var self = this;
-            var store = this.store;
-            var ret = pTag.findTags(function (whole, middle) {
+            var tag = new Tag(stag);
 
-                console.log(middle);
-                var tag = new Tag(middle);
+            this.store.populate(tag);
+            this.store.saveVariable(tag);
 
-                if (store.populate(tag)) {
-                    return self.recurse(tag);
-                } else {
-                    return whole;
-                }
+            return tag.findTags(function (whole, middle) {
+                return self.recurse(middle);
             });
-
-            return ret;
         }
     }]);
 
@@ -1083,9 +1073,9 @@ var is = __webpack_require__(0);
 
 var instance = null;
 
-var PList = function () {
-    function PList(data) {
-        _classCallCheck(this, PList);
+var Store = function () {
+    function Store(data) {
+        _classCallCheck(this, Store);
 
         if (instance == null) {
             instance = this;
@@ -1095,7 +1085,7 @@ var PList = function () {
         return instance;
     }
 
-    _createClass(PList, [{
+    _createClass(Store, [{
         key: "init",
         value: function init(data) {
             this.data = data;
@@ -1139,7 +1129,7 @@ var PList = function () {
     }, {
         key: "getRandomWord",
         value: function getRandomWord(list) {
-            return list[Math.floor(Math.random() * list.length)];
+            return list[Math.floor(Math.random() * list.length)].toString();
         }
     }, {
         key: "clear",
@@ -1148,7 +1138,7 @@ var PList = function () {
         }
     }, {
         key: "saveVariable",
-        value: function saveVariable(tag) {
+        value: function saveVariable(tag, value) {
             if (!tag.variable) {
                 return;
             }
@@ -1168,10 +1158,9 @@ var PList = function () {
                 return false;
             }
 
-            this.saveVariable(tag);
-
-            tag.value = ret.str;
+            //this.saveVariable(tag);
             tag.path = ret.path;
+            tag.value = ret.str;
 
             return true;
         }
@@ -1239,10 +1228,10 @@ var PList = function () {
         }
     }]);
 
-    return PList;
+    return Store;
 }();
 
-exports.default = PList;
+exports.default = Store;
 
 /***/ }),
 /* 4 */
@@ -1315,7 +1304,7 @@ var Tag = function () {
         key: 'findTags',
         value: function findTags(callback) {
             if (is.string(this.value)) {
-                return this.value.replace(Tag.SMALL_TAG, callback);
+                return this.value = this.value.replace(Tag.SMALL_TAG, callback);
             }
         }
     }, {

@@ -1,7 +1,7 @@
 var is = require('is_js');
 
 let instance = null;
-class PList {
+class Store {
 
     constructor(data) {
         if (instance == null) {
@@ -48,8 +48,9 @@ class PList {
         this.tempData = {};
     }
 
-    getRandomWord(list) {
-        return list[Math.floor(Math.random() * list.length)];
+    getRandomWord(list) 
+    {
+        return list[Math.floor(Math.random() * list.length)].toString();
     }
 
     clear() 
@@ -57,7 +58,7 @@ class PList {
         this.tempData = {};
     }
 
-    saveVariable(tag){
+    saveVariable(tag, value){
         if(!tag.variable){
             return;
         }
@@ -65,7 +66,7 @@ class PList {
         if(!this.tempData[tag.variable]){
             this.tempData[tag.variable] = [];
         }
-
+           
         this.tempData[tag.variable].push(tag);
     }
 
@@ -76,11 +77,10 @@ class PList {
             return false;
         }
         
-        this.saveVariable(tag);
-
-        tag.value = ret.str;
+        //this.saveVariable(tag);
         tag.path = ret.path;
-        
+        tag.value = ret.str; 
+            
         return true;
     }
 
@@ -158,4 +158,4 @@ class PList {
     }
 }
 
-export default PList;
+export default Store;

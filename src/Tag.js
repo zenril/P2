@@ -20,7 +20,7 @@ class Tag {
 
     findTags(callback){
         if (is.string(this.value)) {
-            return this.value.replace(Tag.SMALL_TAG, callback);
+            return this.value = this.value.replace(Tag.SMALL_TAG, callback);
         } 
     }
 
