@@ -1004,7 +1004,8 @@ var Parzen = function () {
         key: 'make',
         value: function make(props) {
             this.store.clear();
-            return this.recurse(props.src);
+            this.store.tempData["$__compiled"] = [this.recurse(props.src)];
+            return this.recurse("$__compiled");
             //var complete = this.recurse(start.str);
         }
     }, {
@@ -1013,7 +1014,10 @@ var Parzen = function () {
             var self = this;
             var tag = new Tag(stag);
 
-            this.store.populate(tag);
+            if (!this.store.populate(tag)) {
+                return tag.getRawTag();
+            }
+
             this.store.saveVariable(tag);
 
             return tag.findTags(function (whole, middle) {
@@ -1196,6 +1200,10 @@ var Store = function () {
             while (is.object(data) && is.not.array(data)) {
                 if (path.length) {
                     current = path.shift();
+
+                    if (!data[current]) {
+                        return null;
+                    }
                 }
 
                 //allow selecting which specific array look for arrays keywords with [0],[23] at the end.
@@ -1292,7 +1300,7 @@ var Tag = function () {
     function Tag(match) {
         _classCallCheck(this, Tag);
 
-        this.rawTag = match;
+        this.rawTag = match.replace(/\{\{|\}\}/g, "");
         this.variable = this.parseVariable();
         this.path = this.parsePath();
         this.formatters = this.parseFormatters();
@@ -1350,7 +1358,18 @@ var Tag = function () {
     }, {
         key: 'toString',
         value: function toString() {
+            //run 
             return this.value;
+        }
+    }, {
+        key: 'getRawTag',
+        value: function getRawTag() {
+            return "{{" + this.rawTag + "}}";
+        }
+    }, {
+        key: 'setValue',
+        value: function setValue() {
+            //run preformatters
         }
     }]);
 

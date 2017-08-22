@@ -120,7 +120,13 @@ class Store {
             if (path.length) 
             {
                 current = path.shift();
+
+                if(!data[current]){
+                    return null;
+                }
             }
+
+
 
             //allow selecting which specific array look for arrays keywords with [0],[23] at the end.
             var index = current.match(/([^\[\]]*)\[(\d+)\]/);

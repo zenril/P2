@@ -10,13 +10,14 @@ class Tag {
     static get SMALL_TAG() {return  /\{\{([^{}]*)\}\}/g};
 
     constructor(match) {
-        this.rawTag = match;
+        this.rawTag = match.replace(/\{\{|\}\}/g, "");
         this.variable = this.parseVariable();
         this.path = this.parsePath();
         this.formatters = this.parseFormatters();
         this.preFormatters = this.parsePreformatters();
         this.value = '';
     }
+    
 
     findTags(callback){
         if (is.string(this.value)) {
@@ -57,8 +58,20 @@ class Tag {
     }
 
     toString(){
+        //run 
         return this.value;
     }
+
+    getRawTag(){
+        return "{{" + this.rawTag + "}}";
+    }
+
+
+    setValue(){
+        //run preformatters
+    }
+
+
 
 }
 

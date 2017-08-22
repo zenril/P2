@@ -14,12 +14,13 @@
 var p = new Parzen({
     data : {
         root : {
-            big : ["abc {{$t1:test}} {{$t1}} {{$dd}}"] 
+            big : ["abc  {{$t1}} {{$t1:test}} {{$dd}}"] 
         },
         test : ["tv1","tv2 {{tree|reverse|-delete}}"],
         tree : ["green", "orange"]
     }
 });
+
 var t = p.make({ src : "root" });
 
 console.log(t);
