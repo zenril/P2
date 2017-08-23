@@ -1,4 +1,5 @@
 var is = require('is_js');
+var Formatters = require('./Formatters.js').default;
 
 class Tag {
 
@@ -10,6 +11,8 @@ class Tag {
     static get SMALL_TAG() {return  /\{\{([^{}]*)\}\}/g};
 
     constructor(match) {
+        this.mutators = new Formatters();
+
         this.rawTag = match.replace(/\{\{|\}\}/g, "");
         this.variable = this.parseVariable();
         this.path = this.parsePath();
@@ -21,7 +24,8 @@ class Tag {
 
     findTags(callback){
         if (is.string(this.value)) {
-            return this.value = this.value.replace(Tag.SMALL_TAG, callback);
+             this.value = this.value.replace(Tag.SMALL_TAG, callback);
+             return this.toString();
         } 
     }
 
@@ -58,8 +62,15 @@ class Tag {
     }
 
     toString(){
-        //run 
-        return this.value;
+
+        var v = this.value;
+        var self = this; 
+        if(is.array(this.formatters)){
+            this.formatters.forEach(function(element) {
+                v = this.mutators.run(element, self);
+            }, this);
+        }
+        return v;
     }
 
     getRawTag(){
@@ -67,8 +78,15 @@ class Tag {
     }
 
 
-    setValue(){
-        //run preformatters
+    setValue(v){
+        this.value = v;
+        var self = this;
+
+        if(is.array(this.preFormatters)){
+            this.preFormatters.forEach(function(element) {
+                this.value = this.mutators.run(element, self);
+            }, this);
+        }
     }
 
 

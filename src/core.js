@@ -1,22 +1,30 @@
 var is = require('is_js');
 var Store = require('./Store.js').default;
 var Tag = require('./Tag.js').default;
-var f = require('./Formatters.js').default;
+var Formatters = require('./Formatters.js').default;
 
 class Parzen {
     constructor(props) {
         this.variables = {};
         this.store = new Store(props.data);
-        this.formatters = new f();
         
+        
+        if(is.object(props.formatters) && is.not.array(props.formatters)){
+            Formatters.extend(props.formatters);
+        }
+
+        this.formatters = new Formatters();
     }
 
     make(props)
     {
         this.store.clear();
         this.store.tempData["$__compiled"] = [this.recurse(props.src)];
-        return this.recurse("$__compiled");
-        //var complete = this.recurse(start.str); 
+        var ret =  this.recurse("$__compiled");
+        
+        
+        console.log(this.store);
+        return ret;//var complete = this.recurse(start.str); 
     }
  
     recurse(stag) 
@@ -30,9 +38,13 @@ class Parzen {
 
         this.store.saveVariable(tag);
 
-        return tag.findTags((whole, middle) => {
+        tag.findTags((whole, middle) => {
             return self.recurse(middle);
         });
+
+        
+
+        return tag.toString();
     }
 }
 

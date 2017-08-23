@@ -79,7 +79,7 @@ class Store {
         
         //this.saveVariable(tag);
         tag.path = ret.path;
-        tag.value = ret.str; 
+        tag.setValue(ret.str); 
             
         return true;
     }

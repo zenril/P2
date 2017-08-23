@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -975,10 +975,119 @@
     return is;
 }));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ansas = __webpack_require__(6);
+var Format = __webpack_require__(7).default;
+
+var Formatters = function (_Format) {
+    _inherits(Formatters, _Format);
+
+    function Formatters() {
+        _classCallCheck(this, Formatters);
+
+        return _possibleConstructorReturn(this, (Formatters.__proto__ || Object.getPrototypeOf(Formatters)).apply(this, arguments));
+    }
+
+    _createClass(Formatters, [{
+        key: 'upperCaseFirstChar',
+
+
+        //upper case first
+        value: function upperCaseFirstChar(phrase) {
+            return phrase.value.charAt(0).toUpperCase() + phrase.value.slice(1);
+        }
+    }, {
+        key: 'ucf',
+        value: function ucf(phrase) {
+            return this.upperCaseFirstChar(phrase);
+        }
+
+        //upper case all    
+
+    }, {
+        key: 'upperCaseAll',
+        value: function upperCaseAll(phrase) {
+            return phrase.value.toUpperCase();
+        }
+    }, {
+        key: 'uc',
+        value: function uc(phrase) {
+            return this.upperCaseAll(phrase);
+        }
+
+        //upper case first character of each word
+
+    }, {
+        key: 'upperCaseEachWord',
+        value: function upperCaseEachWord(phrase) {
+            return phrase.value.replace(/\w\S*/g, function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
+    }, {
+        key: 'ucw',
+        value: function ucw(phrase) {
+            this.upperCaseEachWord(phrase);
+        }
+
+        //reverse all
+
+    }, {
+        key: 'reverse',
+        value: function reverse(phrase) {
+            return phrase.value.split('').reverse().join('');
+        }
+    }, {
+        key: 'rev',
+        value: function rev(phrase) {
+            return this.reverse(phrase);
+        }
+
+        //reverse word order
+
+    }, {
+        key: 'wordReverse',
+        value: function wordReverse(phrase) {
+            return phrase.value.split('').reverse().join('').split(' ').reverse().join(' ');
+        }
+    }, {
+        key: 'wrev',
+        value: function wrev(phrase) {
+            return this.wordReverse(phrase);
+        }
+
+        //indefinite article
+
+
+    }]);
+
+    return Formatters;
+}(Format);
+
+exports.default = Formatters;
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -989,9 +1098,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
-var Store = __webpack_require__(3).default;
-var Tag = __webpack_require__(4).default;
-var f = __webpack_require__(5).default;
+var Store = __webpack_require__(4).default;
+var Tag = __webpack_require__(5).default;
+var Formatters = __webpack_require__(1).default;
 
 var Parzen = function () {
     function Parzen(props) {
@@ -999,7 +1108,12 @@ var Parzen = function () {
 
         this.variables = {};
         this.store = new Store(props.data);
-        this.formatters = new f();
+
+        if (is.object(props.formatters) && is.not.array(props.formatters)) {
+            Formatters.extend(props.formatters);
+        }
+
+        this.formatters = new Formatters();
     }
 
     _createClass(Parzen, [{
@@ -1007,8 +1121,10 @@ var Parzen = function () {
         value: function make(props) {
             this.store.clear();
             this.store.tempData["$__compiled"] = [this.recurse(props.src)];
-            return this.recurse("$__compiled");
-            //var complete = this.recurse(start.str); 
+            var ret = this.recurse("$__compiled");
+
+            console.log(this.store);
+            return ret; //var complete = this.recurse(start.str); 
         }
     }, {
         key: 'recurse',
@@ -1022,9 +1138,11 @@ var Parzen = function () {
 
             this.store.saveVariable(tag);
 
-            return tag.findTags(function (whole, middle) {
+            tag.findTags(function (whole, middle) {
                 return self.recurse(middle);
             });
+
+            return tag.toString();
         }
     }]);
 
@@ -1034,7 +1152,7 @@ var Parzen = function () {
 window.Parzen = Parzen;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 var g;
@@ -1061,7 +1179,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1166,7 +1284,7 @@ var Store = function () {
 
             //this.saveVariable(tag);
             tag.path = ret.path;
-            tag.value = ret.str;
+            tag.setValue(ret.str);
 
             return true;
         }
@@ -1244,7 +1362,7 @@ var Store = function () {
 exports.default = Store;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1259,6 +1377,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
+var Formatters = __webpack_require__(1).default;
 
 var Tag = function () {
     _createClass(Tag, null, [{
@@ -1302,6 +1421,8 @@ var Tag = function () {
     function Tag(match) {
         _classCallCheck(this, Tag);
 
+        this.mutators = new Formatters();
+
         this.rawTag = match.replace(/\{\{|\}\}/g, "");
         this.variable = this.parseVariable();
         this.path = this.parsePath();
@@ -1314,7 +1435,8 @@ var Tag = function () {
         key: 'findTags',
         value: function findTags(callback) {
             if (is.string(this.value)) {
-                return this.value = this.value.replace(Tag.SMALL_TAG, callback);
+                this.value = this.value.replace(Tag.SMALL_TAG, callback);
+                return this.toString();
             }
         }
     }, {
@@ -1360,8 +1482,15 @@ var Tag = function () {
     }, {
         key: 'toString',
         value: function toString() {
-            //run 
-            return this.value;
+
+            var v = this.value;
+            var self = this;
+            if (is.array(this.formatters)) {
+                this.formatters.forEach(function (element) {
+                    v = this.mutators.run(element, self);
+                }, this);
+            }
+            return v;
         }
     }, {
         key: 'getRawTag',
@@ -1370,8 +1499,15 @@ var Tag = function () {
         }
     }, {
         key: 'setValue',
-        value: function setValue() {
-            //run preformatters
+        value: function setValue(v) {
+            this.value = v;
+            var self = this;
+
+            if (is.array(this.preFormatters)) {
+                this.preFormatters.forEach(function (element) {
+                    this.value = this.mutators.run(element, self);
+                }, this);
+            }
         }
     }]);
 
@@ -1379,116 +1515,6 @@ var Tag = function () {
 }();
 
 exports.default = Tag;
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ansas = __webpack_require__(6);
-
-var instance = null;
-
-var Formatters = function () {
-    function Formatters(data) {
-        _classCallCheck(this, Formatters);
-
-        if (instance == null) {
-            instance = this;
-        }
-
-        console.log(ansas);
-
-        return instance;
-    }
-
-    //upper case first
-
-
-    _createClass(Formatters, [{
-        key: 'upperCaseFirstChar',
-        value: function upperCaseFirstChar(phrase) {
-            return phrase.value.charAt(0).toUpperCase() + phrase.value.slice(1);
-        }
-    }, {
-        key: 'ucf',
-        value: function ucf(phrase) {
-            return this.upperCaseFirstChar(phrase);
-        }
-
-        //upper case all    
-
-    }, {
-        key: 'upperCaseAll',
-        value: function upperCaseAll(phrase) {
-            return phrase.value.toUpperCase();
-        }
-    }, {
-        key: 'uc',
-        value: function uc(phrase) {
-            this.upperCaseAll(phrase);
-        }
-
-        //upper case first character of each word
-
-    }, {
-        key: 'upperCaseEachWord',
-        value: function upperCaseEachWord(phrase) {
-            return phrase.value.replace(/\w\S*/g, function (txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            });
-        }
-    }, {
-        key: 'ucw',
-        value: function ucw(phrase) {
-            this.upperCaseEachWord(phrase);
-        }
-
-        //reverse all
-
-    }, {
-        key: 'reverse',
-        value: function reverse(phrase) {
-            return phrase.value.split('').reverse().join('');
-        }
-    }, {
-        key: 'rev',
-        value: function rev(phrase) {
-            return this.reverse(phrase);
-        }
-
-        //reverse word order
-
-    }, {
-        key: 'wordReverse',
-        value: function wordReverse(phrase) {
-            return phrase.value.split('').reverse().join('').split(' ').reverse().join(' ');
-        }
-    }, {
-        key: 'wrev',
-        value: function wrev(phrase) {
-            return this.wordReverse(phrase);
-        }
-
-        //indefinite article
-
-
-    }]);
-
-    return Formatters;
-}();
-
-exports.default = Formatters;
 
 /***/ }),
 /* 6 */
@@ -1586,6 +1612,60 @@ if ((typeof module !== 'undefined') && (typeof module.exports !== 'undefined')) 
     window.indefiniteArticle = indefiniteArticle;
 }
 
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var is = __webpack_require__(0);
+
+var instance = null;
+
+var Format = function () {
+    function Format(data) {
+        _classCallCheck(this, Format);
+
+        if (instance == null) {
+            instance = this;
+        }
+        return instance;
+    }
+
+    _createClass(Format, [{
+        key: 'run',
+        value: function run(name, tag) {
+            if (is.function(this[name])) {
+                var formatter = this[name](tag);
+                return formatter;
+            }
+        }
+    }], [{
+        key: 'extend',
+        value: function extend(functions) {
+            for (var key in functions) {
+                if (functions.hasOwnProperty(key)) {
+                    var element = functions[key];
+                    Format.prototype[key] = element;
+                }
+            }
+        }
+    }]);
+
+    return Format;
+}();
+
+exports.default = Format;
 
 /***/ })
 /******/ ]);

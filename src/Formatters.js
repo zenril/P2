@@ -1,19 +1,8 @@
 var ansas = require('indefinite-article');
+var Format = require('./Format.js').default;
 
-let instance = null;
-class Formatters {
-    
 
-    constructor(data) {
-        if (instance == null) {
-            instance = this;
-        }
-
-        console.log(ansas);
-
-        return instance;
-    }
-
+class Formatters extends Format {
 
     //upper case first
     upperCaseFirstChar(phrase)
@@ -34,7 +23,7 @@ class Formatters {
 
     uc(phrase)
     {
-        this.upperCaseAll(phrase);
+        return this.upperCaseAll(phrase);
     }
 
     //upper case first character of each word

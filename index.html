@@ -11,20 +11,28 @@
 <script src="/build/parzen.js"></script>
 
 <script>
-var p = new Parzen({
-    data : {
-        root : {
-            big : ["abc  {{$t1}} {{$t1:test}} {{$dd}}"] 
-        },
-        test : ["tv1","tv2 {{tree|reverse|-delete}}"],
-        tree : ["green {{$dd:bob}}", "orange {{$dd:bob}}"],
-        bob : [ "vv", "cc"]
+
+    var formatters = {
+        "bb" : function (){
+            console.log("pppp[[[[[[[[[[");
+        }
     }
-});
 
-var t = p.make({ src : "root" });
 
-console.log(t);
+    var p = new Parzen({
+        formatters : formatters,
+        
+        data : {
+            root : {
+                big : ["abc {{$ted:bob|-rev|-wrev}} {{$ted}}"] 
+            },
+            bob : [ "hello bob", "tricky dicky"]
+        }
+    });
+
+    var t = p.make({ src : "root" });
+
+    console.log(t);
 </script>
 </body>
 </html>
