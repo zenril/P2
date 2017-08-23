@@ -1,11 +1,14 @@
 var is = require('is_js');
 var Store = require('./Store.js').default;
 var Tag = require('./Tag.js').default;
+var f = require('./Formatters.js').default;
 
 class Parzen {
     constructor(props) {
         this.variables = {};
         this.store = new Store(props.data);
+        this.formatters = new f();
+        
     }
 
     make(props)
@@ -13,7 +16,7 @@ class Parzen {
         this.store.clear();
         this.store.tempData["$__compiled"] = [this.recurse(props.src)];
         return this.recurse("$__compiled");
-        //var complete = this.recurse(start.str);
+        //var complete = this.recurse(start.str); 
     }
  
     recurse(stag) 

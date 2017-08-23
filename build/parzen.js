@@ -991,6 +991,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var is = __webpack_require__(0);
 var Store = __webpack_require__(3).default;
 var Tag = __webpack_require__(4).default;
+var f = __webpack_require__(5).default;
 
 var Parzen = function () {
     function Parzen(props) {
@@ -998,6 +999,7 @@ var Parzen = function () {
 
         this.variables = {};
         this.store = new Store(props.data);
+        this.formatters = new f();
     }
 
     _createClass(Parzen, [{
@@ -1006,7 +1008,7 @@ var Parzen = function () {
             this.store.clear();
             this.store.tempData["$__compiled"] = [this.recurse(props.src)];
             return this.recurse("$__compiled");
-            //var complete = this.recurse(start.str);
+            //var complete = this.recurse(start.str); 
         }
     }, {
         key: 'recurse',
@@ -1377,6 +1379,213 @@ var Tag = function () {
 }();
 
 exports.default = Tag;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ansas = __webpack_require__(6);
+
+var instance = null;
+
+var Formatters = function () {
+    function Formatters(data) {
+        _classCallCheck(this, Formatters);
+
+        if (instance == null) {
+            instance = this;
+        }
+
+        console.log(ansas);
+
+        return instance;
+    }
+
+    //upper case first
+
+
+    _createClass(Formatters, [{
+        key: 'upperCaseFirstChar',
+        value: function upperCaseFirstChar(phrase) {
+            return phrase.value.charAt(0).toUpperCase() + phrase.value.slice(1);
+        }
+    }, {
+        key: 'ucf',
+        value: function ucf(phrase) {
+            return this.upperCaseFirstChar(phrase);
+        }
+
+        //upper case all    
+
+    }, {
+        key: 'upperCaseAll',
+        value: function upperCaseAll(phrase) {
+            return phrase.value.toUpperCase();
+        }
+    }, {
+        key: 'uc',
+        value: function uc(phrase) {
+            this.upperCaseAll(phrase);
+        }
+
+        //upper case first character of each word
+
+    }, {
+        key: 'upperCaseEachWord',
+        value: function upperCaseEachWord(phrase) {
+            return phrase.value.replace(/\w\S*/g, function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
+    }, {
+        key: 'ucw',
+        value: function ucw(phrase) {
+            this.upperCaseEachWord(phrase);
+        }
+
+        //reverse all
+
+    }, {
+        key: 'reverse',
+        value: function reverse(phrase) {
+            return phrase.value.split('').reverse().join('');
+        }
+    }, {
+        key: 'rev',
+        value: function rev(phrase) {
+            return this.reverse(phrase);
+        }
+
+        //reverse word order
+
+    }, {
+        key: 'wordReverse',
+        value: function wordReverse(phrase) {
+            return phrase.value.split('').reverse().join('').split(' ').reverse().join(' ');
+        }
+    }, {
+        key: 'wrev',
+        value: function wrev(phrase) {
+            return this.wordReverse(phrase);
+        }
+
+        //indefinite article
+
+
+    }]);
+
+    return Formatters;
+}();
+
+exports.default = Formatters;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+/*
+ * indefinite-article.js v1.0.0, 12-18-2011
+ *
+ * @author: Rodrigo Neri (@rigoneri)
+ *
+ * (The MIT License)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+var indefiniteArticle = function(phrase) {
+    var i, word;
+
+    // Getting the first word
+    var match = /\w+/.exec(phrase);
+    if (match)
+        word = match[0];
+    else
+        return "an";
+
+    var l_word = word.toLowerCase();
+    // Specific start of words that should be preceeded by 'an'
+    var alt_cases = ["honest", "hour", "hono"];
+    for (i in alt_cases) {
+        if (l_word.indexOf(alt_cases[i]) == 0)
+            return "an";
+    }
+
+    // Single letter word which should be preceeded by 'an'
+    if (l_word.length == 1) {
+        if ("aedhilmnorsx".indexOf(l_word) >= 0)
+            return "an";
+        else
+            return "a";
+    }
+
+    // Capital words which should likely be preceeded by 'an'
+    if (word.match(/(?!FJO|[HLMNS]Y.|RY[EO]|SQU|(F[LR]?|[HL]|MN?|N|RH?|S[CHKLMNPTVW]?|X(YL)?)[AEIOU])[FHLMNRSX][A-Z]/)) {
+        return "an";
+    }
+
+    // Special cases where a word that begins with a vowel should be preceeded by 'a'
+    var regexes = [/^e[uw]/, /^onc?e\b/, /^uni([^nmd]|mo)/, /^u[bcfhjkqrst][aeiou]/];
+    for (i = 0; i < regexes.length; i++) {
+        if (l_word.match(regexes[i]))
+            return "a"
+    }
+
+    // Special capital words (UK, UN)
+    if (word.match(/^U[NK][AIEO]/)) {
+        return "a";
+    }
+    else if (word == word.toUpperCase()) {
+        if ("aedhilmnorsx".indexOf(l_word[0]) >= 0)
+            return "an";
+        else
+            return "a";
+    }
+
+    // Basic method of words that begin with a vowel being preceeded by 'an'
+    if ("aeiou".indexOf(l_word[0]) >= 0)
+        return "an";
+
+    // Instances where y follwed by specific letters is preceeded by 'an'
+    if (l_word.match(/^y(b[lor]|cl[ea]|fere|gg|p[ios]|rou|tt)/))
+        return "an";
+
+    return "a";
+};
+
+if ((typeof module !== 'undefined') && (typeof module.exports !== 'undefined')) {
+    module.exports = indefiniteArticle;
+} else {
+    window.indefiniteArticle = indefiniteArticle;
+}
+
 
 /***/ })
 /******/ ]);
