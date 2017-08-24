@@ -1120,11 +1120,15 @@ var Parzen = function () {
         key: 'make',
         value: function make(props) {
             this.store.clear();
-            this.store.tempData["$__compiled"] = [this.recurse(props.src)];
-            var ret = this.recurse("$__compiled");
+
+            console.log(this.recurse(props.src));
+
+            // this.store.tempData["$__compiled"] = [];
+            // var ret =  this.recurse("$__compiled");
+
 
             console.log(this.store);
-            return ret; //var complete = this.recurse(start.str); 
+            //return ret;//var complete = this.recurse(start.str); 
         }
     }, {
         key: 'recurse',
@@ -1136,6 +1140,7 @@ var Parzen = function () {
                 return tag.getRawTag();
             }
 
+            //console.log(tag.value);
             this.store.saveVariable(tag);
 
             tag.findTags(function (whole, middle) {
@@ -1438,10 +1443,8 @@ var Tag = function () {
     _createClass(Tag, [{
         key: 'findTags',
         value: function findTags(callback) {
-            if (is.string(this.value)) {
-                this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
-                return this.toString();
-            }
+            this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
+            return this.toString();
         }
     }, {
         key: 'parseVariable',
@@ -1490,7 +1493,8 @@ var Tag = function () {
 
             if (is.array(this.formatters)) {
                 self.formatters.forEach(function (element) {
-                    return self.mutators.run(element, self);
+                    var after = self.mutators.run(element, self);
+                    return after;
                 }, self);
             }
         }

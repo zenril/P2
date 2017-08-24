@@ -19,12 +19,17 @@ class Parzen {
     make(props)
     {
         this.store.clear();
-        this.store.tempData["$__compiled"] = [this.recurse(props.src)];
-        var ret =  this.recurse("$__compiled");
+
+
+        console.log(this.recurse(props.src));
+
+
+        // this.store.tempData["$__compiled"] = [];
+        // var ret =  this.recurse("$__compiled");
         
         
         console.log(this.store);
-        return ret;//var complete = this.recurse(start.str); 
+       //return ret;//var complete = this.recurse(start.str); 
     }
  
     recurse(stag) 
@@ -36,6 +41,7 @@ class Parzen {
             return tag.getRawTag();            
         }
 
+        //console.log(tag.value);
         this.store.saveVariable(tag);
 
         tag.findTags((whole, middle) => {

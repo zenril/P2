@@ -23,10 +23,8 @@ class Tag {
     
 
     findTags(callback){
-        if (is.string(this.value)) {
-             this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
-             return this.toString();
-        } 
+        this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
+        return this.toString();
     }
 
     parseVariable() {
@@ -66,7 +64,8 @@ class Tag {
 
         if(is.array(this.formatters)){
             self.formatters.forEach(function(element) {
-                return self.mutators.run(element, self);
+                var after = self.mutators.run(element, self);
+                return after;
             }, self);
         }
     }

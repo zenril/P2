@@ -12,19 +12,12 @@
 
 <script>
 
-    var formatters = {
-        "bb" : function (){
-            console.log("pppp[[[[[[[[[[");
-        }
-    }
 
 
     var p = new Parzen({
-        formatters : formatters,
-        
         data : {
             root : {
-                big : ["abc {{$ted:bob|rev|wrev}} {{$ted}}"] 
+                big : ["abc {{$ted:bob|rev}}"] 
             },
             bob : [ "hello bob", "tricky dicky"]
         }
