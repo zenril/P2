@@ -24,7 +24,7 @@ class Tag {
 
     findTags(callback){
         if (is.string(this.value)) {
-             this.value = this.value.replace(Tag.SMALL_TAG, callback);
+             this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
              return this.toString();
         } 
     }
@@ -62,15 +62,13 @@ class Tag {
     }
 
     toString(){
+        var self = this;
 
-        var v = this.value;
-        var self = this; 
         if(is.array(this.formatters)){
-            this.formatters.forEach(function(element) {
-                v = this.mutators.run(element, self);
-            }, this);
+            self.formatters.forEach(function(element) {
+                return self.mutators.run(element, self);
+            }, self);
         }
-        return v;
     }
 
     getRawTag(){
@@ -80,17 +78,14 @@ class Tag {
 
     setValue(v){
         this.value = v;
-        var self = this;
+        var self = this; 
 
         if(is.array(this.preFormatters)){
-            this.preFormatters.forEach(function(element) {
-                this.value = this.mutators.run(element, self);
-            }, this);
+            self.preFormatters.forEach(function(element) {
+                self.value = self.mutators.run(element, self);
+            }, self);
         }
     }
-
-
-
 }
 
 export default Tag;

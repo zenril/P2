@@ -996,7 +996,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ansas = __webpack_require__(6);
+var ia = __webpack_require__(6);
 var Format = __webpack_require__(7).default;
 
 var Formatters = function (_Format) {
@@ -1047,7 +1047,7 @@ var Formatters = function (_Format) {
     }, {
         key: 'ucw',
         value: function ucw(phrase) {
-            this.upperCaseEachWord(phrase);
+            return this.upperCaseEachWord(phrase);
         }
 
         //reverse all
@@ -1253,7 +1253,11 @@ var Store = function () {
     }, {
         key: "getRandomWord",
         value: function getRandomWord(list) {
-            return list[Math.floor(Math.random() * list.length)].toString();
+            var word = list[Math.floor(Math.random() * list.length)];
+            if (!word) {
+                return null;
+            }
+            return word.toString();
         }
     }, {
         key: "clear",
@@ -1435,7 +1439,7 @@ var Tag = function () {
         key: 'findTags',
         value: function findTags(callback) {
             if (is.string(this.value)) {
-                this.value = this.value.replace(Tag.SMALL_TAG, callback);
+                this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
                 return this.toString();
             }
         }
@@ -1482,15 +1486,13 @@ var Tag = function () {
     }, {
         key: 'toString',
         value: function toString() {
-
-            var v = this.value;
             var self = this;
+
             if (is.array(this.formatters)) {
-                this.formatters.forEach(function (element) {
-                    v = this.mutators.run(element, self);
-                }, this);
+                self.formatters.forEach(function (element) {
+                    return self.mutators.run(element, self);
+                }, self);
             }
-            return v;
         }
     }, {
         key: 'getRawTag',
@@ -1504,9 +1506,9 @@ var Tag = function () {
             var self = this;
 
             if (is.array(this.preFormatters)) {
-                this.preFormatters.forEach(function (element) {
-                    this.value = this.mutators.run(element, self);
-                }, this);
+                self.preFormatters.forEach(function (element) {
+                    self.value = self.mutators.run(element, self);
+                }, self);
             }
         }
     }]);

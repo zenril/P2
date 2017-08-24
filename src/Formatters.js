@@ -1,4 +1,4 @@
-var ansas = require('indefinite-article');
+var ia = require('indefinite-article');
 var Format = require('./Format.js').default;
 
 
@@ -36,7 +36,7 @@ class Formatters extends Format {
 
     ucw(phrase)
     {
-        this.upperCaseEachWord(phrase);
+        return this.upperCaseEachWord(phrase);
     }
 
     //reverse all

@@ -49,8 +49,12 @@ class Store {
     }
 
     getRandomWord(list) 
-    {
-        return list[Math.floor(Math.random() * list.length)].toString();
+    {   
+        var word = list[Math.floor(Math.random() * list.length)];
+        if(!word){
+            return null;
+        }
+        return word.toString();
     }
 
     clear() 
