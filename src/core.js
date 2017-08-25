@@ -20,16 +20,10 @@ class Parzen {
     {
         this.store.clear();
 
-
-        console.log(this.recurse(props.src));
-
-
-        // this.store.tempData["$__compiled"] = [];
-        // var ret =  this.recurse("$__compiled");
+        this.store.tempData["$__compiled"] = [this.recurse(props.src)];
+        var ret =  this.recurse("$__compiled");        
         
-        
-        console.log(this.store);
-       //return ret;//var complete = this.recurse(start.str); 
+        return ret;
     }
  
     recurse(stag) 
@@ -41,16 +35,13 @@ class Parzen {
             return tag.getRawTag();            
         }
 
-        //console.log(tag.value);
         this.store.saveVariable(tag);
 
         tag.findTags((whole, middle) => {
             return self.recurse(middle);
         });
 
-        
-
-        return tag.toString();
+        return tag.getValue();
     }
 }
 

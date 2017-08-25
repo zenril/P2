@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -975,10 +975,173 @@
     return is;
 }));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var is = __webpack_require__(0);
+var Formatters = __webpack_require__(2).default;
+
+var Tag = function () {
+    _createClass(Tag, null, [{
+        key: 'REGEX_VARIABLE',
+        get: function get() {
+            return (/(\$[^:]*):/
+            );
+        }
+    }, {
+        key: 'REGEX_PATH',
+        get: function get() {
+            return (/^(?:\$[^:]+:){0,1}([^|&]*)/
+            );
+        }
+    }, {
+        key: 'REGEX_POST_SAVE_FORMATTERS',
+        get: function get() {
+            return (/\|([^\-][^|]*)/g
+            );
+        }
+    }, {
+        key: 'REGEX_PRE_SAVE_FORMATTERS',
+        get: function get() {
+            return (/\|-([^|]*)/g
+            );
+        }
+    }, {
+        key: 'REGEX_TAG',
+        get: function get() {
+            return (/\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g
+            );
+        }
+    }, {
+        key: 'SMALL_TAG',
+        get: function get() {
+            return (/\{\{([^{}]*)\}\}/g
+            );
+        }
+    }]);
+
+    function Tag(match) {
+        _classCallCheck(this, Tag);
+
+        this.mutators = new Formatters();
+        this.rawTag = match.replace(/\{\{|\}\}/g, "");
+        this.variable = this.parseVariable();
+        this.path = this.parsePath();
+        this.postFormatters = this.parsePostSaveformatters();
+        this.preFormatters = this.parsePreSaveFormatters();
+        this.value = '';
+    }
+
+    _createClass(Tag, [{
+        key: 'duplicateClean',
+        value: function duplicateClean() {
+            var cloned = new Tag(this.rawTag);
+            cloned.path = this.path;
+            cloned.postformatters = [];
+            cloned.preFormatters = [];
+            cloned.variable = this.variable;
+            cloned.value = this.value;
+            return cloned;
+        }
+    }, {
+        key: 'findTags',
+        value: function findTags(callback) {
+            this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
+            return this.getValue();
+        }
+    }, {
+        key: 'parseVariable',
+        value: function parseVariable() {
+            var variable = this.rawTag.match(Tag.REGEX_VARIABLE);
+            if (is.array(variable)) {
+                return variable[1];
+            }
+            return null;
+        }
+    }, {
+        key: 'parsePath',
+        value: function parsePath() {
+            var path = this.rawTag.match(Tag.REGEX_PATH);
+            if (is.array(path)) {
+                return path[1].replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');
+            }
+            return null;
+        }
+    }, {
+        key: 'parsePostSaveformatters',
+        value: function parsePostSaveformatters() {
+            var formatter = this.rawTag.match(Tag.REGEX_POST_SAVE_FORMATTERS);
+            if (is.array(formatter)) {
+                return formatter.map(function (a) {
+                    return a.substr(1);
+                });
+            }
+            return null;
+        }
+    }, {
+        key: 'parsePreSaveFormatters',
+        value: function parsePreSaveFormatters() {
+            var formatter = this.rawTag.match(Tag.REGEX_PRE_SAVE_FORMATTERS);
+            if (is.array(formatter)) {
+                return formatter.map(function (a) {
+                    return a.substr(2);
+                });
+            }
+            return null;
+        }
+    }, {
+        key: 'getRawTag',
+        value: function getRawTag() {
+            return "{{" + this.rawTag + "}}";
+        }
+    }, {
+        key: 'getValue',
+        value: function getValue() {
+            var self = this;
+            var value = self.value;
+            if (is.array(this.postFormatters)) {
+                self.postFormatters.forEach(function (element) {
+                    value = self.mutators.run(element, self, value);
+                }, self);
+            }
+            return value;
+        }
+    }, {
+        key: 'setValue',
+        value: function setValue(value) {
+            var self = this;
+
+            if (is.array(this.preFormatters)) {
+                self.preFormatters.forEach(function (element) {
+                    value = self.mutators.run(element, self, value);
+                }, self);
+            }
+
+            this.value = value;
+        }
+    }]);
+
+    return Tag;
+}();
+
+exports.default = Tag;
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1011,74 +1174,77 @@ var Formatters = function (_Format) {
     _createClass(Formatters, [{
         key: 'upperCaseFirstChar',
 
-
         //upper case first
-        value: function upperCaseFirstChar(phrase) {
-            return phrase.value.charAt(0).toUpperCase() + phrase.value.slice(1);
+        value: function upperCaseFirstChar(phrase, value) {
+            return value.charAt(0).toUpperCase() + value.slice(1);
         }
     }, {
         key: 'ucf',
-        value: function ucf(phrase) {
-            return this.upperCaseFirstChar(phrase);
+        value: function ucf(phrase, value) {
+            return this.upperCaseFirstChar(phrase, value);
         }
 
         //upper case all    
 
     }, {
         key: 'upperCaseAll',
-        value: function upperCaseAll(phrase) {
-            return phrase.value.toUpperCase();
+        value: function upperCaseAll(phrase, value) {
+            return value.toUpperCase();
         }
     }, {
         key: 'uc',
-        value: function uc(phrase) {
-            return this.upperCaseAll(phrase);
+        value: function uc(phrase, value) {
+            return this.upperCaseAll(phrase, value);
         }
 
         //upper case first character of each word
 
     }, {
         key: 'upperCaseEachWord',
-        value: function upperCaseEachWord(phrase) {
-            return phrase.value.replace(/\w\S*/g, function (txt) {
+        value: function upperCaseEachWord(phrase, value) {
+            return value.replace(/\w\S*/g, function (txt) {
                 return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             });
         }
     }, {
         key: 'ucw',
-        value: function ucw(phrase) {
-            return this.upperCaseEachWord(phrase);
+        value: function ucw(phrase, value) {
+            return this.upperCaseEachWord(phrase, value);
         }
 
         //reverse all
 
     }, {
         key: 'reverse',
-        value: function reverse(phrase) {
-            return phrase.value.split('').reverse().join('');
+        value: function reverse(phrase, value) {
+            return value.split('').reverse().join('');
         }
     }, {
         key: 'rev',
-        value: function rev(phrase) {
-            return this.reverse(phrase);
+        value: function rev(phrase, value) {
+            return this.reverse(phrase, value);
         }
 
         //reverse word order
 
     }, {
         key: 'wordReverse',
-        value: function wordReverse(phrase) {
-            return phrase.value.split('').reverse().join('').split(' ').reverse().join(' ');
+        value: function wordReverse(phrase, value) {
+            return value.split('').reverse().join('').split(' ').reverse().join(' ');
         }
     }, {
         key: 'wrev',
-        value: function wrev(phrase) {
-            return this.wordReverse(phrase);
+        value: function wrev(phrase, value) {
+            return this.wordReverse(phrase, value);
         }
 
         //indefinite article
 
-
+    }, {
+        key: 'an',
+        value: function an(phrase, value) {
+            return ia(value) + " " + value;
+        }
     }]);
 
     return Formatters;
@@ -1087,7 +1253,7 @@ var Formatters = function (_Format) {
 exports.default = Formatters;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1098,9 +1264,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
-var Store = __webpack_require__(4).default;
-var Tag = __webpack_require__(5).default;
-var Formatters = __webpack_require__(1).default;
+var Store = __webpack_require__(5).default;
+var Tag = __webpack_require__(1).default;
+var Formatters = __webpack_require__(2).default;
 
 var Parzen = function () {
     function Parzen(props) {
@@ -1121,14 +1287,10 @@ var Parzen = function () {
         value: function make(props) {
             this.store.clear();
 
-            console.log(this.recurse(props.src));
+            this.store.tempData["$__compiled"] = [this.recurse(props.src)];
+            var ret = this.recurse("$__compiled");
 
-            // this.store.tempData["$__compiled"] = [];
-            // var ret =  this.recurse("$__compiled");
-
-
-            console.log(this.store);
-            //return ret;//var complete = this.recurse(start.str); 
+            return ret;
         }
     }, {
         key: 'recurse',
@@ -1140,14 +1302,13 @@ var Parzen = function () {
                 return tag.getRawTag();
             }
 
-            //console.log(tag.value);
             this.store.saveVariable(tag);
 
             tag.findTags(function (whole, middle) {
                 return self.recurse(middle);
             });
 
-            return tag.toString();
+            return tag.getValue();
         }
     }]);
 
@@ -1157,7 +1318,7 @@ var Parzen = function () {
 window.Parzen = Parzen;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 var g;
@@ -1184,7 +1345,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1199,6 +1360,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
+var Tag = __webpack_require__(1).default;
 
 var instance = null;
 
@@ -1215,13 +1377,13 @@ var Store = function () {
     }
 
     _createClass(Store, [{
-        key: "init",
+        key: 'init',
         value: function init(data) {
             this.data = data;
             this.tempData = {};
         }
     }, {
-        key: "setToPath",
+        key: 'setToPath',
         value: function setToPath(obj, path, value) {
             path = path.replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');
             for (i = 0; i < path.length - 1; i++) {
@@ -1240,37 +1402,41 @@ var Store = function () {
             obj[key].push(value);
         }
     }, {
-        key: "setTempVar",
+        key: 'setTempVar',
         value: function setTempVar(key, value) {
             setToPath(this.tempData, path, value);
         }
     }, {
-        key: "setPathVar",
+        key: 'setPathVar',
         value: function setPathVar(path, value) {
             setToPath(this.data, path, value);
         }
     }, {
-        key: "setData",
+        key: 'setData',
         value: function setData(data) {
             this.data = data;
             this.tempData = {};
         }
     }, {
-        key: "getRandomWord",
+        key: 'getRandomWord',
         value: function getRandomWord(list) {
             var word = list[Math.floor(Math.random() * list.length)];
             if (!word) {
                 return null;
             }
-            return word.toString();
+
+            if (word instanceof Tag) {
+                return word.value;
+            }
+            return word;
         }
     }, {
-        key: "clear",
+        key: 'clear',
         value: function clear() {
             this.tempData = {};
         }
     }, {
-        key: "saveVariable",
+        key: 'saveVariable',
         value: function saveVariable(tag, value) {
             if (!tag.variable) {
                 return;
@@ -1280,10 +1446,10 @@ var Store = function () {
                 this.tempData[tag.variable] = [];
             }
 
-            this.tempData[tag.variable].push(tag);
+            this.tempData[tag.variable].push(tag.duplicateClean());
         }
     }, {
-        key: "populate",
+        key: 'populate',
         value: function populate(tag) {
             var ret = this.get(tag);
 
@@ -1298,7 +1464,7 @@ var Store = function () {
             return true;
         }
     }, {
-        key: "get",
+        key: 'get',
         value: function get(tag) {
             var path = tag.path;
             if (!path.length) {
@@ -1316,6 +1482,20 @@ var Store = function () {
             var data = this.data;
             if (path.length > 0 && path[0].substr(0, 1) == "$") {
                 data = this.tempData;
+            }
+
+            if (path.length > 1 && path.slice(-1)[0].substr(0, 1) == "$") {
+                var end = path.slice(-1)[0];
+                if (this.tempData[end]) {
+                    var likeTag = this.tempData[end];
+
+                    if (likeTag && likeTag[0]) {
+                        var like = likeTag[0].path.slice(-1)[0];
+                        path[path.length - 1] = like;
+                    }
+
+                    console.log(path);
+                }
             }
 
             //if the root node doesnt match we wont return any matches
@@ -1369,158 +1549,6 @@ var Store = function () {
 }();
 
 exports.default = Store;
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var is = __webpack_require__(0);
-var Formatters = __webpack_require__(1).default;
-
-var Tag = function () {
-    _createClass(Tag, null, [{
-        key: 'REGEX_VARIABLE',
-        get: function get() {
-            return (/(\$[^:]*):/
-            );
-        }
-    }, {
-        key: 'REGEX_PATH',
-        get: function get() {
-            return (/^(?:\$[^:]+:){0,1}([^|&]*)/
-            );
-        }
-    }, {
-        key: 'REGEX_FORMATTERS',
-        get: function get() {
-            return (/\|([^\-][^|]*)/g
-            );
-        }
-    }, {
-        key: 'REGEX_PRE_FORMATTERS',
-        get: function get() {
-            return (/\|-([^|]*)/g
-            );
-        }
-    }, {
-        key: 'REGEX_TAG',
-        get: function get() {
-            return (/\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g
-            );
-        }
-    }, {
-        key: 'SMALL_TAG',
-        get: function get() {
-            return (/\{\{([^{}]*)\}\}/g
-            );
-        }
-    }]);
-
-    function Tag(match) {
-        _classCallCheck(this, Tag);
-
-        this.mutators = new Formatters();
-
-        this.rawTag = match.replace(/\{\{|\}\}/g, "");
-        this.variable = this.parseVariable();
-        this.path = this.parsePath();
-        this.formatters = this.parseFormatters();
-        this.preFormatters = this.parsePreformatters();
-        this.value = '';
-    }
-
-    _createClass(Tag, [{
-        key: 'findTags',
-        value: function findTags(callback) {
-            this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
-            return this.toString();
-        }
-    }, {
-        key: 'parseVariable',
-        value: function parseVariable() {
-            var variable = this.rawTag.match(Tag.REGEX_VARIABLE);
-            if (is.array(variable)) {
-                return variable[1];
-            }
-            return null;
-        }
-    }, {
-        key: 'parsePath',
-        value: function parsePath() {
-            var path = this.rawTag.match(Tag.REGEX_PATH);
-            if (is.array(path)) {
-                return path[1].replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');
-            }
-            return null;
-        }
-    }, {
-        key: 'parseFormatters',
-        value: function parseFormatters() {
-            var formatter = this.rawTag.match(Tag.REGEX_FORMATTERS);
-            if (is.array(formatter)) {
-                return formatter.map(function (a) {
-                    return a.substr(1);
-                });
-            }
-            return null;
-        }
-    }, {
-        key: 'parsePreformatters',
-        value: function parsePreformatters() {
-            var formatter = this.rawTag.match(Tag.REGEX_PRE_FORMATTERS);
-            if (is.array(formatter)) {
-                return formatter.map(function (a) {
-                    return a.substr(2);
-                });
-            }
-            return null;
-        }
-    }, {
-        key: 'toString',
-        value: function toString() {
-            var self = this;
-
-            if (is.array(this.formatters)) {
-                self.formatters.forEach(function (element) {
-                    var after = self.mutators.run(element, self);
-                    return after;
-                }, self);
-            }
-        }
-    }, {
-        key: 'getRawTag',
-        value: function getRawTag() {
-            return "{{" + this.rawTag + "}}";
-        }
-    }, {
-        key: 'setValue',
-        value: function setValue(v) {
-            this.value = v;
-            var self = this;
-
-            if (is.array(this.preFormatters)) {
-                self.preFormatters.forEach(function (element) {
-                    self.value = self.mutators.run(element, self);
-                }, self);
-            }
-        }
-    }]);
-
-    return Tag;
-}();
-
-exports.default = Tag;
 
 /***/ }),
 /* 6 */
@@ -1635,6 +1663,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
+var Store = __webpack_require__(5).default;
 
 var instance = null;
 
@@ -1650,9 +1679,9 @@ var Format = function () {
 
     _createClass(Format, [{
         key: 'run',
-        value: function run(name, tag) {
+        value: function run(name, tag, value) {
             if (is.function(this[name])) {
-                var formatter = this[name](tag);
+                var formatter = this[name](tag, value);
                 return formatter;
             }
         }

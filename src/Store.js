@@ -1,4 +1,5 @@
 var is = require('is_js');
+var Tag = require('./Tag.js').default;
 
 let instance = null;
 class Store {
@@ -54,7 +55,11 @@ class Store {
         if(!word){
             return null;
         }
-        return word.toString();
+
+        if(word instanceof Tag){
+            return word.value;
+        }
+        return word;
     }
 
     clear() 
@@ -71,7 +76,7 @@ class Store {
             this.tempData[tag.variable] = [];
         }
            
-        this.tempData[tag.variable].push(tag);
+        this.tempData[tag.variable].push(tag.duplicateClean());
     }
 
     populate(tag){
@@ -108,6 +113,22 @@ class Store {
         if (path.length > 0 && path[0].substr(0, 1) == "$") 
         {
             data = this.tempData;
+        }
+
+        if (path.length > 1 && path.slice(-1)[0].substr(0, 1) == "$") 
+        {
+            var end = path.slice(-1)[0];
+            if(this.tempData[end]){
+                var likeTag = this.tempData[end];
+                
+                if(likeTag && likeTag[0]){
+                    var like = likeTag[0].path.slice(-1)[0];
+                    path[path.length - 1] = like;
+                }
+
+                console.log(path);
+            }
+
         }
 
 

@@ -1,10 +1,12 @@
 var is = require('is_js');
+var Store = require('./Store.js').default;
 
 let instance = null;
 
 class Format 
 {
     constructor(data) {
+        
         if (instance == null) {
             instance = this;
         }
@@ -21,9 +23,9 @@ class Format
         }
     }
 
-    run(name, tag){
+    run(name, tag, value){
         if(is.function(this[name])){
-            var formatter = this[name](tag);
+            var formatter = this[name](tag, value);
             return formatter;
         }
     }

@@ -2,66 +2,70 @@ var ia = require('indefinite-article');
 var Format = require('./Format.js').default;
 
 
-class Formatters extends Format {
 
+class Formatters extends Format {
     //upper case first
-    upperCaseFirstChar(phrase)
+    upperCaseFirstChar(phrase, value)
     {
-        return phrase.value.charAt(0).toUpperCase() + phrase.value.slice(1);
+        return value.charAt(0).toUpperCase() + value.slice(1);
     }
 
-    ucf(phrase)
+    ucf(phrase, value)
     {
-        return this.upperCaseFirstChar(phrase);
+        return this.upperCaseFirstChar(phrase, value);
     }
 
     //upper case all    
-    upperCaseAll(phrase)
+    upperCaseAll(phrase, value)
     {
-        return phrase.value.toUpperCase();
+        return value.toUpperCase();
     }
 
-    uc(phrase)
+    uc(phrase, value)
     {
-        return this.upperCaseAll(phrase);
+        return this.upperCaseAll(phrase, value);
     }
 
     //upper case first character of each word
-    upperCaseEachWord(phrase)
+    upperCaseEachWord(phrase, value)
     {
-        return phrase.value.replace(/\w\S*/g, txt => {
+        return value.replace(/\w\S*/g, txt => {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
         });
     }
 
-    ucw(phrase)
+    ucw(phrase, value)
     {
-        return this.upperCaseEachWord(phrase);
+        return this.upperCaseEachWord(phrase, value);
     }
 
     //reverse all
-    reverse(phrase)
+    reverse(phrase, value)
     {
-        return phrase.value.split('').reverse().join('');
+        return value.split('').reverse().join('');
     }
 
-    rev(phrase)
+    rev(phrase, value)
     {
-        return this.reverse(phrase);
+        return this.reverse(phrase, value);
     }
 
     //reverse word order
-    wordReverse(phrase)
+    wordReverse(phrase, value)
     {
-        return phrase.value.split('').reverse().join('').split(' ').reverse().join(' ');
+        return value.split('').reverse().join('').split(' ').reverse().join(' ');
     }
 
-    wrev(phrase)
+    wrev(phrase, value)
     {
-        return this.wordReverse(phrase);
+        return this.wordReverse(phrase, value);
     }
 
     //indefinite article
+    
+    an(phrase, value){
+        return ia(value) + " " + value;
+    }
 
 
 }

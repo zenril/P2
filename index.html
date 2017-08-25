@@ -16,16 +16,21 @@
 
     var p = new Parzen({
         data : {
-            root : {
-                big : ["abc {{$ted:bob|rev}}"] 
+            root : ["{{$b:bob}} climbed a {{tree.$b}}"],
+            bob : { 
+                small: ["small bob"],
+                big: ["big bob"]
             },
-            bob : [ "hello bob", "tricky dicky"]
+            tree : {
+                big : [ "big tree" ],
+                small : [ "small tree" ]
+            }
         }
     });
 
     var t = p.make({ src : "root" });
 
     console.log(t);
-</script>
+</script> 
 </body>
 </html>
