@@ -13,6 +13,16 @@ class Store {
         return instance;
     }
 
+    find(tag)
+    {
+
+    }
+
+    compileForRootTag(tag)
+    {
+        recurse
+    }
+
     init(data) {
         this.data = data;
         this.tempData = {};

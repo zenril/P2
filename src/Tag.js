@@ -21,11 +21,13 @@ class Tag {
         this.like = this.parseLike();
         this.reference = this.parseReference();
         
+        
 
         if(this.like){
             this.path.splice(-1);
         }
 
+        this.root = this.parseRoot();
         this.end = this.parseEnd;
 
         this.value = '';
@@ -62,6 +64,16 @@ class Tag {
             }
         }
 
+        return null;
+    }
+
+    parseRoot()
+    {
+        if(this.path.length > 0)
+        {   
+            var first = this.path[0];
+            return first;
+        }
         return null;
     }
 
