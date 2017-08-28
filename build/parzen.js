@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -975,7 +975,7 @@
     return is;
 }));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 1 */
@@ -993,7 +993,267 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
-var Formatters = __webpack_require__(2).default;
+var Tag = __webpack_require__(2).default;
+
+var instance = null;
+
+var Store = function () {
+    function Store(data) {
+        _classCallCheck(this, Store);
+
+        if (instance == null) {
+            instance = this;
+            instance.init(data);
+        }
+
+        return instance;
+    }
+
+    _createClass(Store, [{
+        key: 'init',
+        value: function init(data) {
+            this.data = data;
+            this.tempData = {};
+        }
+    }, {
+        key: 'setToPath',
+        value: function setToPath(obj, path, value) {
+            path = path.replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');
+            for (i = 0; i < path.length - 1; i++) {
+                var key = path[i];
+
+                if (!obj[key] && i < path.length - 1) {
+                    obj[key] = {};
+                }
+
+                if (is.not.array(obj[key]) && i == path.length - 1) {
+                    obj[key] = [];
+                }
+
+                obj = obj[key];
+            }
+            obj[key].push(value);
+        }
+    }, {
+        key: 'setTempVar',
+        value: function setTempVar(key, value) {
+            setToPath(this.tempData, path, value);
+        }
+    }, {
+        key: 'setPathVar',
+        value: function setPathVar(path, value) {
+            setToPath(this.data, path, value);
+        }
+    }, {
+        key: 'setData',
+        value: function setData(data) {
+            this.data = data;
+            this.tempData = {};
+        }
+    }, {
+        key: 'getRandomWord',
+        value: function getRandomWord(list) {
+            var word = list[Math.floor(Math.random() * list.length)];
+            if (!word) {
+                return null;
+            }
+
+            if (word instanceof Tag) {
+                return word.value;
+            }
+            return word;
+        }
+    }, {
+        key: 'clear',
+        value: function clear() {
+            this.tempData = {};
+        }
+    }, {
+        key: 'saveVariable',
+        value: function saveVariable(tag, value) {
+            if (!tag.variable) {
+                return;
+            }
+
+            if (!this.tempData[tag.variable]) {
+                this.tempData[tag.variable] = [];
+            }
+
+            this.tempData[tag.variable].push(tag.duplicateClean());
+        }
+    }, {
+        key: 'populate',
+        value: function populate(tag) {
+            var ret = this.get(tag);
+
+            if (!ret) {
+                return false;
+            }
+
+            //this.saveVariable(tag);
+            tag.path = ret.path;
+            tag.setValue(ret.str);
+
+            return true;
+        }
+    }, {
+        key: 'dataByRefernceType',
+        value: function dataByRefernceType(reference) {
+            var data = this.data;
+            if (reference) {
+                data = this.tempData;
+            }
+            return data;
+        }
+    }, {
+        key: 'findEndData',
+        value: function findEndData(tag, end) {
+
+            var op = tag.path;
+            var data = this.dataByRefernceType(tag.reference);
+            // while (is.object(data) && is.not.array(data))
+            // {
+            //     if(data[])
+            // }
+
+            op.forEach(function (element) {
+                if (is.not.array(data) && is.object(data) && data[element]) {
+                    data = data[element];
+                }
+            }, this);
+
+            // var data = this.dataByRefernceType($);
+
+            function searchTree(data, key, end) {
+                if (key == end) {
+                    return data;
+                } else if (data != null && is.not.array(data) && is.object(data)) {
+                    var result = null;
+
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            var e = data[key];
+                            result = searchTree(e, key, end);
+                            if (is.array(result)) {
+                                return result;
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+                return null;
+            }
+
+            var end = this.tempData[end][0].end();
+            return searchTree(data, null, end);
+        }
+    }, {
+        key: 'get',
+        value: function get(tag) {
+            var path = tag.path;
+            if (!path.length) {
+                return null;
+            }
+
+            var result = {
+                index: null,
+                path: [],
+                str: ""
+            };
+
+            //is normal path or a variable
+            //if its trying to select a pre saved variable changed to temp data struct
+            var data = this.dataByRefernceType(tag.reference);
+
+            // if (path.length > 1 && path.slice(-1)[0].substr(0, 1) == "$") 
+            // {
+            //     var end = path.slice(-1)[0];
+            //     if(this.tempData[end]){
+            //         var likeTag = this.tempData[end];
+
+            //         if(likeTag && likeTag[0]){
+            //             var like = likeTag[0].path.slice(-1)[0];
+            //             path[path.length - 1] = like;
+            //         }
+
+            //         console.log(path);
+            //     }
+
+            // }
+            if (tag.like) {
+                data = this.findEndData(tag, tag.like);
+            }
+
+            //if the root node doesnt match we wont return any matches
+            var base = path[0];
+            if (!data[base]) {
+                return null;
+            }
+
+            //handle nested lists
+            var current = "";
+            while (is.object(data) && is.not.array(data)) {
+                if (path.length) {
+                    current = path.shift();
+
+                    if (!data[current]) {
+                        return null;
+                    }
+                }
+
+                //allow selecting which specific array look for arrays keywords with [0],[23] at the end.
+                var index = current.match(/([^\[\]]*)\[(\d+)\]/);
+                if (index) {
+                    current = index[1];
+                    if (!isNaN(index[2])) {
+                        result.index = +index[2];
+                    }
+                }
+
+                //if path has ended or path node has failed get a random key from the next nested list
+                if (current == "" || !data.hasOwnProperty(current)) {
+                    current = this.getRandomWord(Object.keys(data));
+                }
+
+                result.path.push(current);
+                data = data[current];
+            }
+
+            //now actuallt
+            if (is.array(data)) {
+                if (result.index != null) {
+                    result.str = data[result.index];
+                }
+                result.str = this.getRandomWord(data);
+                return result;
+            }
+            return null;
+        }
+    }]);
+
+    return Store;
+}();
+
+exports.default = Store;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var is = __webpack_require__(0);
+var Formatters = __webpack_require__(3).default;
 
 var Tag = function () {
     _createClass(Tag, null, [{
@@ -1043,6 +1303,15 @@ var Tag = function () {
         this.path = this.parsePath();
         this.postFormatters = this.parsePostSaveformatters();
         this.preFormatters = this.parsePreSaveFormatters();
+        this.like = this.parseLike();
+        this.reference = this.parseReference();
+
+        if (this.like) {
+            this.path.splice(-1);
+        }
+
+        this.end = this.parseEnd;
+
         this.value = '';
     }
 
@@ -1062,6 +1331,42 @@ var Tag = function () {
         value: function findTags(callback) {
             this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
             return this.getValue();
+        }
+    }, {
+        key: 'parseReference',
+        value: function parseReference() {
+
+            if (this.path.length == 1) {
+                var last = this.path[0];
+                if (last.substr(0, 1) == "$") {
+                    return last;
+                }
+            }
+
+            return null;
+        }
+    }, {
+        key: 'parseEnd',
+        value: function parseEnd() {
+
+            if (this.path) {
+                return this.path.slice(-1)[0];
+            }
+
+            return null;
+        }
+    }, {
+        key: 'parseLike',
+        value: function parseLike() {
+
+            if (this.path.length > 1) {
+                var last = this.path.slice(-1)[0];
+                if (last.substr(0, 1) == "$") {
+                    return last;
+                }
+            }
+
+            return null;
         }
     }, {
         key: 'parseVariable',
@@ -1141,7 +1446,7 @@ var Tag = function () {
 exports.default = Tag;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1253,7 +1558,7 @@ var Formatters = function (_Format) {
 exports.default = Formatters;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1264,9 +1569,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
-var Store = __webpack_require__(5).default;
-var Tag = __webpack_require__(1).default;
-var Formatters = __webpack_require__(2).default;
+var Store = __webpack_require__(1).default;
+var Tag = __webpack_require__(2).default;
+var Formatters = __webpack_require__(3).default;
 
 var Parzen = function () {
     function Parzen(props) {
@@ -1318,7 +1623,7 @@ var Parzen = function () {
 window.Parzen = Parzen;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 var g;
@@ -1343,212 +1648,6 @@ try {
 
 module.exports = g;
 
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var is = __webpack_require__(0);
-var Tag = __webpack_require__(1).default;
-
-var instance = null;
-
-var Store = function () {
-    function Store(data) {
-        _classCallCheck(this, Store);
-
-        if (instance == null) {
-            instance = this;
-            instance.init(data);
-        }
-
-        return instance;
-    }
-
-    _createClass(Store, [{
-        key: 'init',
-        value: function init(data) {
-            this.data = data;
-            this.tempData = {};
-        }
-    }, {
-        key: 'setToPath',
-        value: function setToPath(obj, path, value) {
-            path = path.replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');
-            for (i = 0; i < path.length - 1; i++) {
-                var key = path[i];
-
-                if (!obj[key] && i < path.length - 1) {
-                    obj[key] = {};
-                }
-
-                if (is.not.array(obj[key]) && i == path.length - 1) {
-                    obj[key] = [];
-                }
-
-                obj = obj[key];
-            }
-            obj[key].push(value);
-        }
-    }, {
-        key: 'setTempVar',
-        value: function setTempVar(key, value) {
-            setToPath(this.tempData, path, value);
-        }
-    }, {
-        key: 'setPathVar',
-        value: function setPathVar(path, value) {
-            setToPath(this.data, path, value);
-        }
-    }, {
-        key: 'setData',
-        value: function setData(data) {
-            this.data = data;
-            this.tempData = {};
-        }
-    }, {
-        key: 'getRandomWord',
-        value: function getRandomWord(list) {
-            var word = list[Math.floor(Math.random() * list.length)];
-            if (!word) {
-                return null;
-            }
-
-            if (word instanceof Tag) {
-                return word.value;
-            }
-            return word;
-        }
-    }, {
-        key: 'clear',
-        value: function clear() {
-            this.tempData = {};
-        }
-    }, {
-        key: 'saveVariable',
-        value: function saveVariable(tag, value) {
-            if (!tag.variable) {
-                return;
-            }
-
-            if (!this.tempData[tag.variable]) {
-                this.tempData[tag.variable] = [];
-            }
-
-            this.tempData[tag.variable].push(tag.duplicateClean());
-        }
-    }, {
-        key: 'populate',
-        value: function populate(tag) {
-            var ret = this.get(tag);
-
-            if (!ret) {
-                return false;
-            }
-
-            //this.saveVariable(tag);
-            tag.path = ret.path;
-            tag.setValue(ret.str);
-
-            return true;
-        }
-    }, {
-        key: 'get',
-        value: function get(tag) {
-            var path = tag.path;
-            if (!path.length) {
-                return null;
-            }
-
-            var result = {
-                index: null,
-                path: [],
-                str: ""
-            };
-
-            //is normal path or a variable
-            //if its trying to select a pre saved variable changed to temp data struct
-            var data = this.data;
-            if (path.length > 0 && path[0].substr(0, 1) == "$") {
-                data = this.tempData;
-            }
-
-            if (path.length > 1 && path.slice(-1)[0].substr(0, 1) == "$") {
-                var end = path.slice(-1)[0];
-                if (this.tempData[end]) {
-                    var likeTag = this.tempData[end];
-
-                    if (likeTag && likeTag[0]) {
-                        var like = likeTag[0].path.slice(-1)[0];
-                        path[path.length - 1] = like;
-                    }
-
-                    console.log(path);
-                }
-            }
-
-            //if the root node doesnt match we wont return any matches
-            var base = path[0];
-            if (!data[base]) {
-                return null;
-            }
-
-            //handle nested lists
-            var current = "";
-            while (is.object(data) && is.not.array(data)) {
-                if (path.length) {
-                    current = path.shift();
-
-                    if (!data[current]) {
-                        return null;
-                    }
-                }
-
-                //allow selecting which specific array look for arrays keywords with [0],[23] at the end.
-                var index = current.match(/([^\[\]]*)\[(\d+)\]/);
-                if (index) {
-                    current = index[1];
-                    if (!isNaN(index[2])) {
-                        result.index = +index[2];
-                    }
-                }
-
-                //if path has ended or path node has failed get a random key from the next nested list
-                if (current == "" || !data.hasOwnProperty(current)) {
-                    current = this.getRandomWord(Object.keys(data));
-                }
-
-                result.path.push(current);
-                data = data[current];
-            }
-
-            //now actuallt
-            if (is.array(data)) {
-                if (result.index != null) {
-                    result.str = data[result.index];
-                }
-                result.str = this.getRandomWord(data);
-                return result;
-            }
-            return null;
-        }
-    }]);
-
-    return Store;
-}();
-
-exports.default = Store;
 
 /***/ }),
 /* 6 */
@@ -1663,7 +1762,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var is = __webpack_require__(0);
-var Store = __webpack_require__(5).default;
+var Store = __webpack_require__(1).default;
 
 var instance = null;
 

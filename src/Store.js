@@ -93,6 +93,60 @@ class Store {
         return true;
     }
 
+    dataByRefernceType(reference)
+    {
+        var data = this.data;
+        if (reference) 
+        {
+            data = this.tempData;
+        }
+        return data;
+    }
+
+    findEndData(tag, end)
+    {
+
+        var op = tag.path;
+        var data = this.dataByRefernceType(tag.reference);
+        // while (is.object(data) && is.not.array(data))
+        // {
+        //     if(data[])
+        // }
+
+        op.forEach(function(element) {
+            if(is.not.array( data ) && is.object( data ) && data[element]){
+                data = data[element];
+            }
+        }, this);
+
+        // var data = this.dataByRefernceType($);
+
+        function searchTree(data, key, end){
+            if(key == end){
+                return data;
+            }else if (data != null && is.not.array(data) && is.object(data)){
+                var result = null;
+                
+                for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        var e = data[key];
+                        result = searchTree(e,key, end);
+                        if( is.array(result) ){
+                            return result;
+                        }
+                    }
+                }
+
+                return result;
+            }
+            return null;
+        }
+
+        
+        var end = this.tempData[end][0].end();
+        return searchTree(data, null, end);
+    }
+
     get(tag) 
     {
         let path = tag.path;
@@ -109,28 +163,26 @@ class Store {
 
         //is normal path or a variable
         //if its trying to select a pre saved variable changed to temp data struct
-        var data = this.data;
-        if (path.length > 0 && path[0].substr(0, 1) == "$") 
-        {
-            data = this.tempData;
-        }
+        var data = this.dataByRefernceType(tag.reference);
 
-        if (path.length > 1 && path.slice(-1)[0].substr(0, 1) == "$") 
-        {
-            var end = path.slice(-1)[0];
-            if(this.tempData[end]){
-                var likeTag = this.tempData[end];
+        // if (path.length > 1 && path.slice(-1)[0].substr(0, 1) == "$") 
+        // {
+        //     var end = path.slice(-1)[0];
+        //     if(this.tempData[end]){
+        //         var likeTag = this.tempData[end];
                 
-                if(likeTag && likeTag[0]){
-                    var like = likeTag[0].path.slice(-1)[0];
-                    path[path.length - 1] = like;
-                }
+        //         if(likeTag && likeTag[0]){
+        //             var like = likeTag[0].path.slice(-1)[0];
+        //             path[path.length - 1] = like;
+        //         }
 
-                console.log(path);
-            }
+        //         console.log(path);
+        //     }
 
+        // }
+        if(tag.like){
+            data = this.findEndData(tag, tag.like);
         }
-
 
         //if the root node doesnt match we wont return any matches
         var base = path[0];

@@ -18,6 +18,16 @@ class Tag {
         this.path = this.parsePath();
         this.postFormatters = this.parsePostSaveformatters();
         this.preFormatters = this.parsePreSaveFormatters();
+        this.like = this.parseLike();
+        this.reference = this.parseReference();
+        
+
+        if(this.like){
+            this.path.splice(-1);
+        }
+
+        this.end = this.parseEnd;
+
         this.value = '';
     }
 
@@ -38,6 +48,47 @@ class Tag {
     {
         this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
         return this.getValue();
+    }
+
+    parseReference()
+    {
+       
+        if(this.path.length == 1)
+        {   
+            var last = this.path[0];
+            if(last.substr(0, 1) == "$")
+            {
+                return last;
+            }
+        }
+
+        return null;
+    }
+
+    parseEnd()
+    {
+       
+        if(this.path)
+        {
+            return this.path.slice(-1)[0];
+        }
+
+        return null;
+    }
+
+    parseLike()
+    {
+       
+        if(this.path.length > 1)
+        {   
+            var last = this.path.slice(-1)[0];
+            if(last.substr(0, 1) == "$")
+            {
+                return last;
+            }
+        }
+
+        return null;
     }
 
     parseVariable() 
