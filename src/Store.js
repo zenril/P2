@@ -67,7 +67,7 @@ class Store {
                     // }
 
 
-                    recurse(cur[p], pp, addto ? addto : []);
+                    recurse(cur[p], pp, []);
                 }
                 
                 
