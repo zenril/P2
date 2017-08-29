@@ -9,24 +9,90 @@ class Store {
             instance = this;
             instance.init(data);
         }
-
         return instance;
     }
 
-    find(tag)
+    find(path)
     {
 
     }
 
-    compileForRootTag(tag)
+    compileFo()
     {
         recurse
     }
 
     init(data) {
         this.data = data;
+        this.compiled = this.flatten(this.data);
         this.tempData = {};
     }
+
+    function flatten(data) {
+        var result = {};
+        function recurse (cur, prop, addto) {
+
+            if(prop && !result[prop]){
+                result[prop] = {
+                    values : []
+                };
+                addto.push(result[prop].values);
+            }
+            
+            if (Object(cur) !== cur) {
+                result[prop] = cur;
+            } else if (Array.isArray(cur)) {
+                result[prop].values = cur;
+
+                if(Array.isArray(addto)){
+                    addto.forEach(function(array) {
+                        cur.forEach(function(item) {
+                            array.push(item);
+                        });
+                    });
+                }
+
+            } else {
+                var isEmpty = true;
+                
+                
+
+                for (var p in cur) {
+                    isEmpty = false;
+
+                    pp = prop ? prop+"."+p : p;
+                    
+                    // if(pp && !result[pp]){
+                        
+                    // }
+
+
+                    recurse(cur[p], pp, addto ? addto : []);
+                }
+                
+                
+            }
+        }
+        recurse(data, "", null);
+        return result;
+    }
+
+flatten({
+            root : ["{{$b:bob}} climbed a {{tree.$b}}"],
+            bob : { 
+                small: {
+                    small1 : ["small bob"],
+                    small2 : ["small steve"]
+                },
+            
+                big: ["big bob","asdasd"]
+            },
+            tree : {
+                big : [ "big tree" ],
+                small : [ "small tree" ]
+            }
+        })
+
 
     setToPath(obj, path, value) {
         path = path.replace(/(\[|\]\.)/g, ".").replace(/\]/g, "").split('.');
@@ -175,21 +241,6 @@ class Store {
         //if its trying to select a pre saved variable changed to temp data struct
         var data = this.dataByRefernceType(tag.reference);
 
-        // if (path.length > 1 && path.slice(-1)[0].substr(0, 1) == "$") 
-        // {
-        //     var end = path.slice(-1)[0];
-        //     if(this.tempData[end]){
-        //         var likeTag = this.tempData[end];
-                
-        //         if(likeTag && likeTag[0]){
-        //             var like = likeTag[0].path.slice(-1)[0];
-        //             path[path.length - 1] = like;
-        //         }
-
-        //         console.log(path);
-        //     }
-
-        // }
         if(tag.like){
             data = this.findEndData(tag, tag.like);
         }

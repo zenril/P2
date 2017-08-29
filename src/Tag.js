@@ -46,6 +46,18 @@ class Tag {
     }
     
 
+    //todo
+       //allow selecting which specific array look for arrays keywords with [0],[23] at the end.
+    //    var index = current.match(/([^\[\]]*)\[(\d+)\]/);
+    //    if (index) 
+    //    {
+    //        current = index[1];
+    //        if (!isNaN(index[2])) 
+    //        {
+    //            result.index = +index[2];
+    //        }
+    //    }
+
     findTags(callback)
     {
         this.setValue(this.value.replace(Tag.SMALL_TAG, callback));
