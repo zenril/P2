@@ -36,6 +36,9 @@ class Store {
                 result[prop] = {
                     values : []
                 };
+                if(addto){
+                    addto.push(result[prop].values);
+                }
             }
             
             if (Object(cur) !== cur) {
@@ -43,10 +46,13 @@ class Store {
             } else if (Array.isArray(cur)) {
                 result[prop].values = cur;
 
+
+
                 if(Array.isArray(addto)){
                     addto.forEach(function(array) {
                         cur.forEach(function(item) {
                             array.push(item);
+                            array.push(prop);
                         });
                     });
                 }
@@ -61,17 +67,17 @@ class Store {
 
                     pp = prop ? prop+"."+p : p;
                     
-                    if(pp && !result[pp]){
-                        addto.push(result[prop].values);
-                    }
+                    // if(pp && !result[pp]){
+                        
+                    // }
 
-                    recurse(cur[p], pp, addto ? addto : []);
+                    recurse(cur[p], pp, addto || [] );
                 }
                 
                 
             }
         }
-        recurse(data, "", []);
+        recurse(data, "", null);
         return result;
     }
 
