@@ -31,12 +31,11 @@ class Store {
     function flatten(data) {
         var result = {};
         function recurse (cur, prop, addto) {
-
+            
             if(prop && !result[prop]){
                 result[prop] = {
                     values : []
                 };
-                addto.push(result[prop].values);
             }
             
             if (Object(cur) !== cur) {
@@ -62,18 +61,17 @@ class Store {
 
                     pp = prop ? prop+"."+p : p;
                     
-                    // if(pp && !result[pp]){
-                        
-                    // }
+                    if(pp && !result[pp]){
+                        addto.push(result[prop].values);
+                    }
 
-
-                    recurse(cur[p], pp, []);
+                    recurse(cur[p], pp, addto ? addto : []);
                 }
                 
                 
             }
         }
-        recurse(data, "", null);
+        recurse(data, "", []);
         return result;
     }
 
