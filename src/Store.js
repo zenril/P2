@@ -40,8 +40,16 @@ class Store extends SearchApi {
         {
             path = path + ".." + like.last;
         }
+        
+        var value = this.get(path);
+        if(!value){
+            return false;
+        }
 
-        console.log(this.get(path));
+        tag.setValue(value);
+
+
+        return true; 
         
     }
 

@@ -1,14 +1,17 @@
 var is = require('is_js');
+var _re = require('escape-string-regexp');
+
 var Formatters = require('./Formatters.js').default;
+var config = require('./config.js').default;
 
 class Tag {
 
-    static get REGEX_VARIABLE() {return /(\$[^:]*):/};
-    static get REGEX_PATH() {return /^(?:\$[^:]+:){0,1}([^|&]*)/};
-    static get REGEX_POST_SAVE_FORMATTERS() {return /\|([^\-][^|]*)/g};
-    static get REGEX_PRE_SAVE_FORMATTERS() {return /\|-([^|]*)/g};
-    static get REGEX_TAG() {return /\{\{(\$[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}/g};
-    static get SMALL_TAG() {return /\{\{([^{}]*)\}\}/g};
+    static get REGEX_VARIABLE() {return RegExp("("+_re(config.variable_prefix)+"[^:]*):/"); };
+    static get REGEX_PATH() {return RegExp("^(?:"+_re(config.variable_prefix)+"[^:]+:){0,1}([^|&]*)"); };
+    static get REGEX_POST_SAVE_FORMATTERS() {return RegExp("\|([^\-][^|]*)", "g"); };
+    static get REGEX_PRE_SAVE_FORMATTERS() {return RegExp("\|-([^|]*)", "g"); };
+    static get REGEX_TAG() {return RegExp("\{\{("+_re(config.variable_prefix)+"[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}", "g"); };
+    static get SMALL_TAG() {return RegExp("\{\{([^{}]*)\}\}", "g"); };
 
     constructor(match) 
     {
@@ -70,7 +73,7 @@ class Tag {
         if(this.path.length == 1)
         {   
             var last = this.path[0];
-            if(last.substr(0, 1) == "$")
+            if(last.substr(0, 1) == config.variable_prefix)
             {
                 return last;
             }
@@ -106,7 +109,7 @@ class Tag {
         if(this.path.length > 1)
         {   
             var last = this.path.slice(-1)[0];
-            if(last.substr(0, 1) == "$")
+            if(last.substr(0, 1) == config.variable_prefix)
             {
                 return last;
             }

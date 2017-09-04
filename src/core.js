@@ -20,8 +20,8 @@ class Parzen {
     {
         this.store.clearData();
 
-        this.store.tempData["$__compiled"] = [this.recurse(props.src)];
-        var ret =  this.recurse("$__compiled");        
+        this.store.tempData[config.variable_prefix + "__compiled"] = [this.recurse(props.src)];
+        var ret =  this.recurse(config.variable_prefix + "__compiled");        
         
         return ret;
     }

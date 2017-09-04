@@ -1687,7 +1687,14 @@ var Store = function (_SearchApi) {
                 path = path + ".." + like.last;
             }
 
-            console.log(this.get(path));
+            var value = this.get(path);
+            if (!value) {
+                return false;
+            }
+
+            tag.setValue(value);
+
+            return true;
         }
     }]);
 
@@ -3249,12 +3256,17 @@ var SearchApi = function () {
     }, {
         key: "set",
         value: function set(path, setData) {
+
             var data = this.getData(path);
-            search.value(data, path, setData);
+            var query = "$." + path;
+            search.value(data, query, setData);
         }
     }, {
         key: "get",
         value: function get(query) {
+            if (!query) {
+                return null;
+            }
 
             var data = this.getData(query);
             query = "$." + query;
@@ -3263,14 +3275,15 @@ var SearchApi = function () {
             if (!paths || !paths.length) {
                 return null;
             }
+            var path = paths[0].join(".");
 
-            var value = search.value(data, paths[0]);
+            var value = search.value(data, path);
 
-            if (!values) {
+            if (!value) {
                 return null;
             }
 
-            return value;
+            return value[0];
         }
     }]);
 
@@ -14517,7 +14530,7 @@ exports.SourceNode = SourceNode;
 /* 42 */
 /***/ (function(module, exports) {
 
-module.exports = {"_args":[[{"raw":"escodegen@~0.0.24","scope":null,"escapedName":"escodegen","name":"escodegen","rawSpec":"~0.0.24","spec":">=0.0.24 <0.1.0","type":"range"},"/Users/aaron/www/p2/node_modules/static-eval"]],"_from":"escodegen@>=0.0.24 <0.1.0","_id":"escodegen@0.0.28","_inCache":true,"_location":"/static-eval/escodegen","_npmUser":{"name":"constellation","email":"utatane.tea@gmail.com"},"_npmVersion":"1.3.8","_phantomChildren":{},"_requested":{"raw":"escodegen@~0.0.24","scope":null,"escapedName":"escodegen","name":"escodegen","rawSpec":"~0.0.24","spec":">=0.0.24 <0.1.0","type":"range"},"_requiredBy":["/static-eval"],"_resolved":"https://registry.npmjs.org/escodegen/-/escodegen-0.0.28.tgz","_shasum":"0e4ff1715f328775d6cab51ac44a406cd7abffd3","_shrinkwrap":null,"_spec":"escodegen@~0.0.24","_where":"/Users/aaron/www/p2/node_modules/static-eval","bin":{"esgenerate":"./bin/esgenerate.js","escodegen":"./bin/escodegen.js"},"bugs":{"url":"https://github.com/Constellation/escodegen/issues"},"dependencies":{"esprima":"~1.0.2","estraverse":"~1.3.0","source-map":">= 0.1.2"},"description":"ECMAScript code generator","devDependencies":{"bower":"*","chai":"~1.7.2","commonjs-everywhere":"~0.8.0","esprima-moz":"*","grunt":"~0.4.1","grunt-cli":"~0.1.9","grunt-contrib-jshint":"~0.5.0","grunt-mocha-test":"~0.6.2","q":"*","semver":"*"},"directories":{},"dist":{"shasum":"0e4ff1715f328775d6cab51ac44a406cd7abffd3","tarball":"https://registry.npmjs.org/escodegen/-/escodegen-0.0.28.tgz"},"engines":{"node":">=0.4.0"},"homepage":"http://github.com/Constellation/escodegen.html","licenses":[{"type":"BSD","url":"http://github.com/Constellation/escodegen/raw/master/LICENSE.BSD"}],"main":"escodegen.js","maintainers":[{"name":"constellation","email":"utatane.tea@gmail.com"}],"name":"escodegen","optionalDependencies":{"source-map":">= 0.1.2"},"readme":"ERROR: No README data found!","repository":{"type":"git","url":"git+ssh://git@github.com/Constellation/escodegen.git"},"scripts":{"build":"./node_modules/.bin/cjsify -a path: tools/entry-point.js > escodegen.browser.js","build-min":"./node_modules/.bin/cjsify -ma path: tools/entry-point.js > escodegen.browser.min.js","lint":"grunt lint","release":"node tools/release.js","test":"grunt travis","unit-test":"grunt test"},"version":"0.0.28"}
+module.exports = {"_args":[["escodegen@~0.0.24","C:\\Users\\aaron\\Projects\\current\\p2\\node_modules\\static-eval"]],"_from":"escodegen@>=0.0.24 <0.1.0","_id":"escodegen@0.0.28","_inCache":true,"_installable":true,"_location":"/static-eval/escodegen","_npmUser":{"email":"utatane.tea@gmail.com","name":"constellation"},"_npmVersion":"1.3.8","_phantomChildren":{},"_requested":{"name":"escodegen","raw":"escodegen@~0.0.24","rawSpec":"~0.0.24","scope":null,"spec":">=0.0.24 <0.1.0","type":"range"},"_requiredBy":["/static-eval"],"_resolved":"https://registry.npmjs.org/escodegen/-/escodegen-0.0.28.tgz","_shasum":"0e4ff1715f328775d6cab51ac44a406cd7abffd3","_shrinkwrap":null,"_spec":"escodegen@~0.0.24","_where":"C:\\Users\\aaron\\Projects\\current\\p2\\node_modules\\static-eval","bin":{"escodegen":"./bin/escodegen.js","esgenerate":"./bin/esgenerate.js"},"bugs":{"url":"https://github.com/Constellation/escodegen/issues"},"dependencies":{"esprima":"~1.0.2","estraverse":"~1.3.0","source-map":">= 0.1.2"},"description":"ECMAScript code generator","devDependencies":{"bower":"*","chai":"~1.7.2","commonjs-everywhere":"~0.8.0","esprima-moz":"*","grunt":"~0.4.1","grunt-cli":"~0.1.9","grunt-contrib-jshint":"~0.5.0","grunt-mocha-test":"~0.6.2","q":"*","semver":"*"},"directories":{},"dist":{"shasum":"0e4ff1715f328775d6cab51ac44a406cd7abffd3","tarball":"https://registry.npmjs.org/escodegen/-/escodegen-0.0.28.tgz"},"engines":{"node":">=0.4.0"},"homepage":"http://github.com/Constellation/escodegen.html","licenses":[{"type":"BSD","url":"http://github.com/Constellation/escodegen/raw/master/LICENSE.BSD"}],"main":"escodegen.js","maintainers":[{"email":"utatane.tea@gmail.com","name":"constellation"}],"name":"escodegen","optionalDependencies":{"source-map":">= 0.1.2"},"readme":"ERROR: No README data found!","repository":{"type":"git","url":"git+ssh://git@github.com/Constellation/escodegen.git"},"scripts":{"build":"./node_modules/.bin/cjsify -a path: tools/entry-point.js > escodegen.browser.js","build-min":"./node_modules/.bin/cjsify -ma path: tools/entry-point.js > escodegen.browser.min.js","lint":"grunt lint","release":"node tools/release.js","test":"grunt travis","unit-test":"grunt test"},"version":"0.0.28"}
 
 /***/ }),
 /* 43 */
