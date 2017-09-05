@@ -6,12 +6,12 @@ var config = require('./config.js').default;
 
 class Tag {
 
-    static get REGEX_VARIABLE() {return RegExp("("+_re(config.variable_prefix)+"[^:]*):/"); };
+    static get REGEX_VARIABLE() {return RegExp("("+_re(config.variable_prefix)+"[^:]*):"); };
     static get REGEX_PATH() {return RegExp("^(?:"+_re(config.variable_prefix)+"[^:]+:){0,1}([^|&]*)"); };
-    static get REGEX_POST_SAVE_FORMATTERS() {return RegExp("\|([^\-][^|]*)", "g"); };
-    static get REGEX_PRE_SAVE_FORMATTERS() {return RegExp("\|-([^|]*)", "g"); };
-    static get REGEX_TAG() {return RegExp("\{\{("+_re(config.variable_prefix)+"[^\:]*\:)*([^{}|]*)([|]{0,2}[^}]*)\}\}", "g"); };
-    static get SMALL_TAG() {return RegExp("\{\{([^{}]*)\}\}", "g"); };
+    static get REGEX_POST_SAVE_FORMATTERS() {return RegExp("\\|([^\\-][^|]*)", "g"); };
+    static get REGEX_PRE_SAVE_FORMATTERS() {return RegExp("\\|-([^|]*)", "g"); };
+    static get REGEX_TAG() {return RegExp("\\{\\{("+_re(config.variable_prefix)+"[^\\:]*\\:)*([^{}|]*)([|]{0,2}[^}]*)\\}\\}", "g"); };
+    static get SMALL_TAG() {return RegExp("\\{\\{([^{}]*)\\}\\}", "g"); };
 
     constructor(match) 
     {

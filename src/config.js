@@ -1,3 +1,3 @@
 export default {
-    "variable_prefix" : "@"
+    "variable_prefix" : "_"
 }

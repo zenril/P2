@@ -1,6 +1,7 @@
 var is = require('is_js');
 var Tag = require('./Tag.js').default;
 var SearchApi = require('./SearchApi.js').default;
+var config = require('./config.js').default;
 
 let instance = null;
 class Store extends SearchApi {
