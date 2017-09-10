@@ -22,10 +22,13 @@
     "webpack": "^3.3.0"
   },
   "dependencies": {
+    "advanced-json-path": "^1.0.8",
     "babel": "^6.23.0",
+    "escape-string-regexp": "^1.0.5",
     "eslint-loader": "^1.9.0",
     "indefinite-article": "0.0.2",
     "is_js": "^0.9.0",
+    "jsonpath": "^0.2.12",
     "webpack": "^3.5.4"
   }
 }

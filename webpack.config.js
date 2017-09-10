@@ -17,6 +17,9 @@
             }
         ]
     },
+    node: {
+        fs: 'empty'
+    },
     stats: {
         colors: true
     },

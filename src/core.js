@@ -2,6 +2,7 @@ var is = require('is_js');
 var Store = require('./Store.js').default;
 var Tag = require('./Tag.js').default;
 var Formatters = require('./Formatters.js').default;
+var config = require('./config.js').default;
 
 class Parzen {
     constructor(props) {
@@ -18,10 +19,10 @@ class Parzen {
 
     make(props)
     {
-        this.store.clear();
+        this.store.clearData();
 
-        this.store.tempData["$__compiled"] = [this.recurse(props.src)];
-        var ret =  this.recurse("$__compiled");        
+        this.store.temp[config.variable_prefix + "_compiled"] = [this.recurse(props.src)];
+        var ret =  this.recurse(config.variable_prefix + "_compiled");
         
         return ret;
     }
@@ -31,7 +32,7 @@ class Parzen {
         var self = this;
         var tag = new Tag(stag);
 
-        if(!this.store.populate(tag)){
+        if(!this.store.populateTag(tag)){
             return tag.getRawTag();            
         }
 
